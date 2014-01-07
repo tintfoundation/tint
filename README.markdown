@@ -1,6 +1,11 @@
 # Tint
 Tint is an experimental communications network that enables [friend-to-friend (F2F)](http://en.wikipedia.org/wiki/Friend-to-friend) communication via a simple protocol.
 
+Here are the goals:
+ 1. Provide a secure method for communication between trusted peers (i.e., friends) without reliance on any intermediaries or single points of failure.
+ 1. Provide the tools necessary to create applications that run in a browser that take advantage of being able to securely communicate with peers.
+ 1. Provide a simple storage mechanism that enables local addressible storage and replication without having to rely on peers to retrieve content.
+
 Here are the basic properties:
  * All users are identified via a sha256 hash of a public key
  * The mapping of sha256 to public key are stored in a [distributed hash table](http://en.wikipedia.org/wiki/Distributed_hash_table)
@@ -17,7 +22,7 @@ The following sections list the basic process for running a hub in either config
 ### Local Hub
 The basic process for running a local hub is simple:
 * Download software and start the service.
-* Ensure that port 8468 (TINT on your phone) is open and internet visible
+* Ensure that port 8468 (i.e., TINT on a number pad) is open and internet visible
 * Visit http://127.0.0.1 and follow the instructions on sharing your identity with friends and adding your friends identities
 
 
@@ -74,11 +79,13 @@ Add should post the actual HTML (or the URL of) an app.
 * Methods: add, delete
 
 # Why Not Just Use X
-* Freenet: ...
-* Gnunet: ...
-* Tor: ...
-* [Pirate Bay](http://torrentfreak.com/how-the-pirate-bay-plans-to-beat-censorship-for-good-140105/): ...
-* [I2P](http://en.wikipedia.org/wiki/I2P): It's been beta software since 2003
+First and foremost issue: None of the alternatives below make it easy to build applications that use the system/protocol.  With Tint, an application can be a few lines of Javascript.  Secondly, they **all** require that bandwith (and sometimes system storage) be shared, requiring the additional complexity of resource usage/behavior monitoring.  Tint is directly friend to friend - and while that means it can be trivial to show that a connection was made - the connection is as fast as possible and doesn't rely on the resources of other users.
+
+* Freenet: Data is stored in a distributed fashion (not bad, but different).  Tint stores your data on your node.
+* Gnunet: All peers act as routers, requiring that resources must be shared.  It's complicated to build applications that use the protocol (try to find even a simple chat application that uses gnunet).
+* Tor: Doesn't enable F2F communication or storage (and it's crazy slow).
+* [Pirate Bay](http://torrentfreak.com/how-the-pirate-bay-plans-to-beat-censorship-for-good-140105/): Suited for general/public distribution of content rather than F2F
+* [I2P](http://en.wikipedia.org/wiki/I2P): It doesn't provide storage functionality (and has been in beta since 2003).
 
 # Help
 Authors will hang out on irc.freenode.net#tint
