@@ -25,7 +25,7 @@ The basic process for running a local hub is simple:
 In this scenario, an internet visible machine will be running as a hub.  Assuming this is a preconfigured Rasberry Pi, you would:
 * Plug in your Pi between your router and your modem
 * Plug in the thumbdrive you received with your Pi and install the chrome extension and public key
-* Click connect on the button in chrome
+* Click connect on the button in chrome and follow the instructions on sharing your identity with friends and adding your friends identities
 
 
 # Protocols
