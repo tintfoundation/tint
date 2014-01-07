@@ -31,7 +31,7 @@ class AnyDBMStorage(PermanentStorage):
         self.db[key] = str(value)
 
     def incr(self, key, amount=1, default=0):
-        value = self.get(key, default) + amount
+        value = int(self.get(key, default)) + amount
         self.set(key, value)
 
     def __getitem__(self, key):
