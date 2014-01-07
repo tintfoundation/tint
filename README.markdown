@@ -81,9 +81,9 @@ Add should post the actual HTML (or the URL of) an app.
 # Why Not Just Use X
 First and foremost issue: None of the alternatives below make it easy to build applications that use the system/protocol.  With Tint, an application can be a few lines of Javascript.  Secondly, they **all** require that bandwith (and sometimes system storage) be shared, requiring the additional complexity of resource usage/behavior monitoring.  Tint is directly friend to friend - and while that means it can be trivial to show that a connection was made - the connection is as fast as possible and doesn't rely on the resources of other users.
 
-* Freenet: Data is stored in a distributed fashion (not bad, but different).  Tint stores your data on your node.
-* Gnunet: All peers act as routers, requiring that resources must be shared.  It's complicated to build applications that use the protocol (try to find even a simple chat application that uses gnunet).
-* Tor: Doesn't enable F2F communication or storage (and it's crazy slow).
+* [Freenet](http://en.wikipedia.org/wiki/Freenet): Data is stored in a distributed fashion (not bad, but different).  Tint stores your data on your node.
+* [Gnunet](http://en.wikipedia.org/wiki/GNUnet): All peers act as routers, requiring that resources must be shared.  It's complicated to build applications that use the protocol (try to find even a simple chat application that uses gnunet).
+* [Tor](http://en.wikipedia.org/wiki/Tor_(anonymity_network)): Doesn't enable F2F communication or storage (and it's crazy slow).
 * [Pirate Bay](http://torrentfreak.com/how-the-pirate-bay-plans-to-beat-censorship-for-good-140105/): Suited for general/public distribution of content rather than F2F
 * [I2P](http://en.wikipedia.org/wiki/I2P): It doesn't provide storage functionality (and has been in beta since 2003).
 
