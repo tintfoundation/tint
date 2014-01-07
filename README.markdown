@@ -18,22 +18,25 @@ The following sections list the basic process for running a hub in either config
 The basic process for running a local hub is simple:
 
 1. Download software and start the service.
-1. Ensure that port 8468 (TINT on your phone) is open and internet visible
-1. Visit http://127.0.0.1 and follow the instructions on sharing your identity with friends and adding your friends identities
+2. Ensure that port 8468 (TINT on your phone) is open and internet visible
+3. Visit http://127.0.0.1 and follow the instructions on sharing your identity with friends and adding your friends identities
+
 
 ### Remote Hub (preferred)
 In this scenario, an internet visible machine will be running as a hub.  Assuming this is a preconfigured Rasberry Pi, you would:
 
 1. Plug in your Pi between your router and your modem
-1. Plug in the thumbdrive you received with your Pi and install the chrome extension and public key
-1. Click connect on the button in chrome
+2. Plug in the thumbdrive you received with your Pi and install the chrome extension and public key
+3. Click connect on the button in chrome
+
 
 # Protocols
 Each hub will run a number of services:
 
 1. DHT - this is based on [Kademlia](http://en.wikipedia.org/wiki/Kademlia)
-1. RPC - this is a simple line-based protocol like memcache that is via SSL and mutual key-based authentication
-1. HTTPS - this provides an interface for front end clients to access the hub and applications that may be running there.
+2. RPC - this is a simple line-based protocol like memcache that is via SSL and mutual key-based authentication
+3. HTTPS - this provides an interface for front end clients to access the hub and applications that may be running there.
+
 
 ### DHT
 Uses the [kademlia library](https://github.com/bmuller/kademlia).
