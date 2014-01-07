@@ -16,27 +16,23 @@ The following sections list the basic process for running a hub in either config
 
 ### Local Hub
 The basic process for running a local hub is simple:
-
-1. Download software and start the service.
-2. Ensure that port 8468 (TINT on your phone) is open and internet visible
-3. Visit http://127.0.0.1 and follow the instructions on sharing your identity with friends and adding your friends identities
+* Download software and start the service.
+* Ensure that port 8468 (TINT on your phone) is open and internet visible
+* Visit http://127.0.0.1 and follow the instructions on sharing your identity with friends and adding your friends identities
 
 
 ### Remote Hub (preferred)
 In this scenario, an internet visible machine will be running as a hub.  Assuming this is a preconfigured Rasberry Pi, you would:
-
-1. Plug in your Pi between your router and your modem
-2. Plug in the thumbdrive you received with your Pi and install the chrome extension and public key
-3. Click connect on the button in chrome
+* Plug in your Pi between your router and your modem
+* Plug in the thumbdrive you received with your Pi and install the chrome extension and public key
+* Click connect on the button in chrome
 
 
 # Protocols
 Each hub will run a number of services:
-
-1. DHT - this is based on [Kademlia](http://en.wikipedia.org/wiki/Kademlia)
-2. RPC - this is a simple line-based protocol like memcache that is via SSL and mutual key-based authentication
-3. HTTPS - this provides an interface for front end clients to access the hub and applications that may be running there.
-
+* DHT - this is based on [Kademlia](http://en.wikipedia.org/wiki/Kademlia)
+* RPC - this is a simple line-based protocol like memcache that is via SSL and mutual key-based authentication
+* HTTPS - this provides an interface for front end clients to access the hub and applications that may be running there.
 
 ### DHT
 Uses the [kademlia library](https://github.com/bmuller/kademlia).
@@ -54,8 +50,8 @@ Each key is treated as a */* separated path to a specific item.  Permissions are
 The web interface allows the hub owner to control permissions and install/access applications.  There are really two interfaces - one is HTTPS and runs on all network interfaces, the others HTTP and runs only on the local interface (127.0.0.1).  To access the HTTPS interface, you will need to install the root certificate created by the hub so that you don't get certificate validity errors in the browser (and so that no one can impersonate the hub).
 
 The HTTPS interface does two things:
-1. It hosts static pages that are each single-page Javascript applications.  One of these is an admin application that allows users to install other applications, add keys for trusted peers, and control permissions for those authorized peers.
-1. It provides an AJAX interface for the single-page Javascript applications (allowing them to access storage, set permissions, and add applications).
+* It hosts static pages that are each single-page Javascript applications.  One of these is an admin application that allows users to install other applications, add keys for trusted peers, and control permissions for those authorized peers.
+* It provides an AJAX interface for the single-page Javascript applications (allowing them to access storage, set permissions, and add applications).
 
 The AJAX interface has three major sections - storage, keys, and apps.  All parameters should be form encoded and use the HTTP POST method.
 
