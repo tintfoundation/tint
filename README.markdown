@@ -29,7 +29,7 @@ The basic process for running a local hub is simple:
 ### Remote Hub (preferred)
 In this scenario, an internet visible machine will be running as a hub.  Assuming this is a preconfigured Rasberry Pi, you would:
 * Plug in your Pi between your router and your modem
-* Plug in the thumbdrive you received with your Pi and install the chrome extension and public key
+* Plug in the thumbdrive you received with your Pi and install the chrome extension and public key to their local machine's keystore (to prevent invalid cert errors in the browser)
 * Click connect on the button in chrome and follow the instructions on sharing your identity with friends and adding your friends identities
 
 
@@ -83,9 +83,12 @@ First and foremost issue: None of the alternatives below make it easy to build a
 
 * [Freenet](http://en.wikipedia.org/wiki/Freenet): Data is stored in a distributed fashion (not bad, but different).  Tint stores your data on your node.
 * [Gnunet](http://en.wikipedia.org/wiki/GNUnet): All peers act as routers, requiring that resources must be shared.  It's complicated to build applications that use the protocol (try to find even a simple chat application that uses gnunet).
-* [Tor](http://en.wikipedia.org/wiki/Tor_(anonymity_network)): Doesn't enable F2F communication or storage (and it's crazy slow).
+* [Tor](http://en.wikipedia.org/wiki/Tor_\(anonymity_network\)): Doesn't enable F2F communication or storage (and it's crazy slow).
 * [Pirate Bay](http://torrentfreak.com/how-the-pirate-bay-plans-to-beat-censorship-for-good-140105/): Suited for general/public distribution of content rather than F2F
 * [I2P](http://en.wikipedia.org/wiki/I2P): It doesn't provide storage functionality (and has been in beta since 2003).
 
 # Help
 Authors will hang out on irc.freenode.net#tint
+
+# BETA Usage
+* pip install -r ./requirements.txt

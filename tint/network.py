@@ -18,3 +18,14 @@ factory.protocol = Echo
 ctx = PFSContextFactory("kia.pem", "brian.pem")
 reactor.listenSSL(8000, factory, ctx)
 reactor.run()
+
+
+
+
+
+from twisted.protocols.basic import LineReceiver
+from twisted.protocols.policies import TimeoutMixin
+
+class TintProtocol(LineReceiver, TimeoutMixin):
+    def __init__(self, timeOut=60):
+        

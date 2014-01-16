@@ -1,54 +1,47 @@
 import time
-from OpenSSL import crypto
 from OpenSSL import SSL
-
 from twisted.internet.ssl import DefaultOpenSSLContextFactory
-from twisted.internet.ssl import KeyPair
-from twisted.internet.ssl import PrivateCertificate
-from twisted.internet.ssl import DistinguishedName
-from twisted.internet.ssl import Certificate
 
-from twisted.python import log
+from tint.log import Logger
 
 class PFSContextFactory(DefaultOpenSSLContextFactory):
     """
     Perfect forward secrecy!  I think...
     """
 
-    _context = None
-    
-    def __init__(self, localCAFileName, remoteCAFileName, expiresIn=86400):
-        with open(localCAFileName, 'r') as capem:
-            self.caroot = PrivateCertificate.loadPEM(capem.read())
-        self.dn = self.caroot.getSubject()
-        self.dn.commonName = self.caroot.getPublicKey().keyHash()
+    def __init__(self, keyStore, expiresIn=86400):
+        self.keyStore = keyStore
         self.expiresIn = expiresIn
-        self.remoteCAFileName = remoteCAFileName
+        self.expiresAt = time.time() + self.expiresIn
+        # we cache this so we can check for changes
+        self.keyStoreSize = len(self.keyStore)
+        self._context = self._makeContext()
+        self.log = Logger(system=self)
 
     def verifyCallback(self, connection, x509, errnum, errdepth, ok):
+        print "verifying cert: ", x509.get_subject()
         if not ok:
-            log.err("invalid cert from subject: %s" % x509.get_subject())
+            self.log.error("invalid cert from subject: %s" % x509.get_subject())
             return False
-        else:
-            return True
+        return True
 
     def getContext(self):
-        if self._context is not None:
-            return self._context
-
-        privkey = KeyPair.generate(crypto.TYPE_RSA, size=1024)
-        signedcert = self.caroot.privateKey.signRequestObject(
-            self.caroot.getIssuer(),
-            privkey.requestObject(self.dn, 'sha1'),
-            int(time.time()),
-            self.expiresIn,
-            digestAlgorithm='sha1')
-
-        self._context = SSL.Context(SSL.SSLv23_METHOD)
-        self._context.set_options(SSL.OP_NO_SSLv2)
-        self._context.use_privatekey(privkey.original)
-        self._context.use_certificate(signedcert.original)
-        flags = SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT
-        self._context.set_verify(flags, self.verifyCallback)
-        self._context.load_verify_locations(self.remoteCAFileName)            
+        if self.expiresAt <= time.time() or len(self.keyStore) != self.keyStoreSize:
+            msg = "asking keystore for new temporary keypair exipiring in %i seconds"
+            self.log.debug(msg % self.expiresIn)
+            self._context = self._makeContext()
+            self.expiresAt = time.time() + self.expiresIn
+            self.keyStoreSize = len(self.keyStore)            
         return self._context
+
+    def _makeContext(self):
+        privkey, signedcert = self.keyStore.generateSignedTmpKeyPair(self.expiresIn)
+        context = SSL.Context(SSL.SSLv23_METHOD)
+        context.set_options(SSL.OP_NO_SSLv2)
+        context.use_privatekey(privkey.original)
+        context.use_certificate(signedcert.original)
+        flags = SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT
+        context.set_verify(flags, self.verifyCallback)
+        for fpath in self.keyStore:
+            context.load_verify_locations(fpath)
+        return context
