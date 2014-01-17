@@ -5,28 +5,29 @@ from tint.log import Logger
 
 log = Logger(system="TintWebAPI")
 
+
 class BadRequest(resource.ErrorPage):
     def __init__(self):
-        ErrorPage.__init__(self, BAD_REQUEST, "Bad Request", "Request malformed.")
+        resource.ErrorPage.__init__(self, BAD_REQUEST, "Bad Request", "Request malformed.")
+
 
 class WebAPI(resource.Resource):
-    def __init__(self, storage):
+    def __init__(self, peerServer):
         resource.Resource.__init__(self)
-        self.putChild('v1', APIVersionOne(storage))
+        self.putChild('v1', APIVersionOne(peerServer))
 
 
 class APIVersionOne(resource.Resource):
-    def __init__(self, storage):
+    def __init__(self, peerServer):
         resource.Resource.__init__(self)
-        self.putChild('storage', StorageResource(storage))
+        self.putChild('storage', StorageResource(peerServer))
 
 
 class StorageResource(resource.Resource):
-    def __init__(self, storage):
+    def __init__(self, peerServer):
         resource.Resource.__init__(self)
-        # Fake it for now
-        self.storage = {}
-    
+        self.peerServer = peerServer
+
     def getParam(self, req, name, default=None):
         return req.args.get(name, [default])[0]
 
@@ -54,12 +55,12 @@ class StorageResource(resource.Resource):
         key = self.getParam(req, 'key')
         if key is None:
             req.setResponseCode(404)
-            return ""            
+            return ""
         return self.storage.get(key, "")
 
     def incrMethod(self, req):
         key = self.getParam(req, 'key')
-        value = self.getParam('value', 1)
+        #value = self.getParam('value', 1)
         if key is None:
             req.setResponseCode(404)
             return ""

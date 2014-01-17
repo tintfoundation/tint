@@ -1,12 +1,3 @@
-"""
-Startup process:
-
-1. initialize key file if doesn't exist
-2. initialize local storage, granting key hash ability to access all of db
-3. start up DHT based on initial list (from where?)
-4. start up local NodeToNode service
-5. start up local web interface
-"""
 import sys
 import os
 
@@ -18,6 +9,7 @@ from tint.web.root import WebRoot
 from tint.storage.permanent import PermissionedAnyDBMStorage
 from tint.ssl.keymagic import KeyStore
 from tint.resolution import DHTResolver
+from tint.peer import Peer
 from config import CONFIG
 
 # 1. initialize key file if doesn't exist
@@ -30,13 +22,15 @@ storage.grantAllAccess(keyStore.getKeyId())
 # 3. start up DHT based on initial list
 application = service.Application("tint")
 resolver = DHTResolver(CONFIG, [("54.193.70.32", 8468)])
-server = internet.UDPServer(8468, resolver.getProtocol())
-server.setServiceParent(application)
+kserver = internet.UDPServer(8468, resolver.getProtocol())
+kserver.setServiceParent(application)
 
 # 4. start up local NodeToNode service
-# TODO
+peer = Peer(keyStore, storage, resolver)
+pserver = internet.SSLServer(CONFIG['s2s.port'], peer.protocolFactory, peer.contextFactory)
+pserver.setServiceParent(application)
 
 # 5. start up local web interface
-web = WebRoot(storage)
+web = WebRoot(peer)
 server = internet.TCPServer(CONFIG['web.port'], server.Site(web))
 server.setServiceParent(application)

@@ -4,6 +4,7 @@ from twisted.internet.ssl import DefaultOpenSSLContextFactory
 
 from tint.log import Logger
 
+
 class PFSContextFactory(DefaultOpenSSLContextFactory):
     """
     Perfect forward secrecy!  I think...
@@ -31,7 +32,7 @@ class PFSContextFactory(DefaultOpenSSLContextFactory):
             self.log.debug(msg % self.expiresIn)
             self._context = self._makeContext()
             self.expiresAt = time.time() + self.expiresIn
-            self.keyStoreSize = len(self.keyStore)            
+            self.keyStoreSize = len(self.keyStore)
         return self._context
 
     def _makeContext(self):

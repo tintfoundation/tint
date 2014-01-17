@@ -1,12 +1,17 @@
-from OpenSSL import crypto
-from twisted.internet import ssl
 import uuid
 import time
 import os
 import glob
+import hashlib
 
-from tint.ssl.utils import sha256
+from OpenSSL import crypto
+from twisted.internet import ssl
+
 from tint.log import Logger
+
+
+def sha256(s):
+    return hashlib.sha256(s).hexdigest()
 
 
 class DuplicateIssuer(Exception):
@@ -123,7 +128,7 @@ class KeyStore(object):
         return self.kpair.getKeyId()
 
     def generateSignedTmpKeyPair(self, expiresIn):
-        self.log.debug("Creating a new tmp keypair that expires in %i seconds" % expiresIn)        
+        self.log.debug("Creating a new tmp keypair that expires in %i seconds" % expiresIn)
         return self.kpair.generateSignedTmpKeyPair(expiresIn)
 
     def refreshAuthorizedKeys(self):

@@ -2,7 +2,7 @@ from collections import deque
 
 from twisted.protocols.policies import TimeoutMixin
 from twisted.internet.protocol import Protocol
-from twisted.internet.defer import Deferred, fail, TimeoutError, maybeDeferred
+from twisted.internet.defer import Deferred, TimeoutError, maybeDeferred
 
 import msgpack
 
@@ -65,7 +65,7 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
     def dataReceived(self, data):
         self.resetTimeout()
         self._buffer += data
-        
+
         if self._expectedLength is None:
             parts = self._buffer.split(' ', 1)
             self._expectedLength = int(parts[0])
@@ -95,11 +95,11 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
     def sendCommand(self, cmd, args):
         if not self._current:
             self.setTimeout(self.persistentTimeOut)
-        
+
         cmdObj = Command(cmd, args)
         self._current.append(cmdObj)
         data = cmdObj.encode()
-        self.transport.write("%i >%s" % (len(data) + 1, data))        
+        self.transport.write("%i >%s" % (len(data) + 1, data))
         return cmdObj._deferred
 
     def responseReceived(self, data):

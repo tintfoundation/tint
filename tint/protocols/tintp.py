@@ -1,11 +1,7 @@
-from twisted.python import log
 from twisted.internet import reactor
-from twisted.internet.protocol import Factory, ClientCreator, Protocol
-from twisted.protocols.basic import LineReceiver
-from twisted.protocols.policies import TimeoutMixin
+from twisted.internet.protocol import Factory, ClientCreator
 
 from tint.protocols.msgpackp import MsgPackProtocol
-from tint.ssl.context import PFSContextFactory
 from tint.log import Logger
 
 
@@ -18,6 +14,7 @@ class TintProtocol(MsgPackProtocol):
         MsgPackProtocol.__init__(self, timeout)
         self.connectionPool = connectionPool
         self.log = Logger(system=self)
+        self.storage = self.connectionPool.storage
         self.peersKeyId = None
 
     def getPeersKeyId(self):
@@ -29,7 +26,7 @@ class TintProtocol(MsgPackProtocol):
         return self.peersKeyId
 
     def dataReceived(self, data):
-        self.connectionPool.saveConnection(self, self.getPeersKeyId())        
+        self.connectionPool.saveConnection(self, self.getPeersKeyId())
         self.log.debug("received data from %s: %s" % (self.getPeersKeyId(), data))
         MsgPackProtocol.dataReceived(self, data)
 
@@ -43,10 +40,13 @@ class TintProtocol(MsgPackProtocol):
         self.log.warning("Connection failed: %s" % str(reason))
 
     def cmd_get(self, key):
-        return "key is %s" % key
+        return self.storage.get(self.getPeersKeyId(), key)
 
     def cmd_set(self, key, value):
-        return "setting %s = %s" % (key, value)
+        return self.storage.set(self.getPeersKeyId(), key, value)
+
+    def cmd_incr(self, key, amount, default):
+        return self.storage.incr(self.getPeersKeyId(), key, amount, default)
 
 
 class TintProtocolFactory(Factory):
@@ -63,11 +63,12 @@ class TintProtocolFactory(Factory):
 
 
 class ConnectionPool(object):
-    def __init__(self, resolver, contextFactory, keyStore):
+    def __init__(self, resolver, contextFactory, keyStore, storage):
         self.connections = {}
         self.resolver = resolver
         self.contextFactory = contextFactory
         self.keyStore = keyStore
+        self.storage = storage
         self.log = Logger(system=self)
 
     def send(self, keyId, cmd, *args):

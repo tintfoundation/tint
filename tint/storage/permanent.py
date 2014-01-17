@@ -23,7 +23,7 @@ class AnyDBMStorage(PermanentStorage):
         self.db = anydbm.open(self.filename, 'c')
 
     def get(self, key, default=None):
-        if self.db.has_key(key):
+        if key in self.db:
             return self.db[key]
         return default
 

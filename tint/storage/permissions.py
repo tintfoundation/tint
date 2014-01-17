@@ -1,3 +1,9 @@
+class NotAuthorizedError(Exception):
+    """
+    Someone is trying to access something they can't.
+    """
+
+
 class DefaultPermissions(object):
     def __init__(self, storage):
         self.storage = storage
@@ -40,6 +46,6 @@ class PermissionedStorage(object):
         self.testAccess(requestor, key)
         self.storage.set(key, value)
 
-    def incr(self, key, amount=1, default=0):
+    def incr(self, requestor, key, amount=1, default=0):
         self.testAccess(requestor, key)
         self.storage.incr(key, amount, default)
