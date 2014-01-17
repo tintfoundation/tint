@@ -1,1 +1,2 @@
 pyopenssl==0.13.1
+msgpack==0.4.0
