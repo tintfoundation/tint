@@ -15,20 +15,73 @@ class Peer(object):
         self.protocolFactory = TintProtocolFactory(self.pool)
         self.log = Logger(system=self)
 
-    def set(self, keyId, skey, svalue):
-        # hey, that's me!
-        if keyId == self.keystore.getKeyId():
-            return self.storage.set(keyId, skey, svalue)
-        return self.pool.send(keyId, 'set', skey, svalue)
+    def getKeyId(self):
+        """
+        Get the keyId used by this peer (this peer's identifier).
 
-    def get(self, keyId, skey):
-        # hey, that's me!
-        if keyId == self.keystore.getKeyId():
-            return self.storage.get(keyId, skey)
-        return self.pool.send(keyId, 'get', skey)
+        This is stored in the key store.
+        """
+        return self.keyStore.getKeyId()
 
-    def incr(self, keyId, skey, amount=1, default=0):
-        # hey, that's me!
-        if keyId == self.keystore.getKeyId():
-            return self.storage.incr(keyId, skey, amount, default)
-        return self.pool.send(keyId, 'incr', skey, amount, default)
+    def getPublicKey(self):
+        """
+        Get the keyId used by this peer (this peer's identifier).
+
+        This is stored in the key store.
+        """
+        return self.keyStore.getPublicKey()
+
+    def set(self, hostKeyId, storagePath, storageValue):
+        """
+        Set a value on a host.
+
+        @param hostKeyId: The key id for the destination host to set the
+        given key.  This could be the local host, in which case the hostKey
+        will be the same as this C{Peer}'s keyStore keyId.
+
+        @param storagePath: The path to the key to set.  For instance, this
+        could be something like /chat/<somekey>/inbox.
+
+        @param storageValue: The value to set.
+        """
+        if hostKeyId == self.getKeyId():
+            return self.storage.set(hostKeyId, storagePath, storageValue)
+        return self.pool.send(hostKeyId, 'set', storagePath, storageValue)
+
+    def get(self, hostKeyId, storagePath):
+        """
+        Get a value from a host.
+
+        @param hostKeyId: The key id for the destination host to get the
+        given key.  This could be the local host, in which case the hostKey
+        will be the same as this C{Peer}'s keyStore keyId.
+
+        @param storagePath: The path to the key to get.  For instance, this
+        could be something like /chat/<somekey>/inbox.
+        """
+        if hostKeyId == self.getKeyId():
+            self.log.debug("getting storagePath %s on self" % storagePath)
+            return self.storage.get(hostKeyId, storagePath)
+        self.log.debug("getting storagePath %s on %s" % (storagePath, hostKeyId))
+        return self.pool.send(hostKeyId, 'get', storagePath)
+
+    def incr(self, hostKeyId, storagePath, amount=1, default=0):
+        """
+        Increment a value on a host.
+
+        @param hostKeyId: The key id for the destination host to increment the
+        given key.  This could be the local host, in which case the hostKey
+        will be the same as this C{Peer}'s keyStore keyId.
+
+        @param storagePath: The path to the key to increment.  For instance, this
+        could be something like /chat/<somekey>/inbox.
+
+        @param amount: The amount to increment.  This could be negative, which
+        would make this actually a decrement.  By default this is 1.
+
+        @param default: The amount to use as the default if no value exists
+        at the given storagePath.  By default this is 0.
+        """
+        if hostKeyId == self.getKeyId():
+            return self.storage.incr(hostKeyId, storagePath, amount, default)
+        return self.pool.send(hostKeyId, 'incr', storagePath, amount, default)

@@ -58,19 +58,33 @@ The HTTPS interface does two things:
 * It hosts static pages that are each single-page Javascript applications.  One of these is an admin application that allows users to install other applications, add keys for trusted peers, and control permissions for those authorized peers.
 * It provides an AJAX interface for the single-page Javascript applications (allowing them to access storage, set permissions, and add applications).
 
-The AJAX interface has three major sections - storage, keys, and apps.  All parameters should be form encoded and use the HTTP POST method.
+The AJAX interface has three major sections - storage, keys, and apps.  All parameters should be form encoded.  The root path is:
+
+    http://<host>/api/v1
 
 #### Storage
-You can get/set/incr storage just like the RPC methods (accessing data both on the user's hub as well as the hubs of any connected friends).  Keys look like:
-tint://sourcesha@destsha/appname/something/something
+You can get/set/incr storage just like the RPC methods (accessing data both on the user's hub as well as the hubs of any connected friends).
 
-* Path: /api/v1/storage
-* Methods: incr / get / set
+Keys look like:
+
+     tint://destsha/appname/something/something
+
+To GET a key, use the root path followed by the key without the protocol.  For instance, send an HTTP GET to:
+
+   http://<host>/api/v1/storage/<dest sha>/chat/<my sha>/inbox
+
+to get the value for */chat/<my sha>/inbox* on the host identified by *<dest sha>*.
+
+To set the value, send a POST to the same URL structure with a *data* parameter set to the thing you want to save.  To send an increment, use a PUT with optional parameters of amount (could be negative to make a decrement) and default (what to start with if there isn't a value).  An increment will return the current value.
 
 #### Keys
+Use a GET to the path:
 
-* Path: /api/v1/keys
-* Methods: add, get (my key's current location on DHT)
+    http://<host>/api/v1/keys
+
+To get a JSON output of the current host key and a list of all trusted keys.
+
+Eventually, you'll be able to POST a new key or a new hash (and then the public key will be looked up on the DHT).  For now, you can manually add keys by placing them in the *keys/authorized* folder.
 
 #### Applications
 Add should post the actual HTML (or the URL of) an app.

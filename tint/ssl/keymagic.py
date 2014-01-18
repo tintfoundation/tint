@@ -96,8 +96,8 @@ class KeyPair(object):
     def __str__(self):
         return self.pemContents
 
-
-class KeyStore(object):
+from twisted.application import service
+class KeyStore(service.Service):
     def __init__(self, keyPath, authorizedKeysDir):
         """
         Handle all key interactions.
@@ -124,8 +124,15 @@ class KeyStore(object):
         self.authorizedKeysDir = authorizedKeysDir
         self.refreshAuthorizedKeys()
 
+    def startService(self):
+        self.log.debug("Using keypair id: %s" % self.getKeyId())
+        service.Service.startService(self)
+
     def getKeyId(self):
         return self.kpair.getKeyId()
+
+    def getPublicKey(self):
+        return self.kpair.getPublicKey()
 
     def generateSignedTmpKeyPair(self, expiresIn):
         self.log.debug("Creating a new tmp keypair that expires in %i seconds" % expiresIn)
@@ -151,6 +158,9 @@ class KeyStore(object):
             msg = "Issuer %s could not be found in local authorized keys"
             raise InvalidIssuer(msg % issuerCommonName)
         return PublicKey.load(self.authorizedKeys[issuerCommonName])
+
+    def getAuthorizedKeysList(self):
+        return [PublicKey.load(fname) for fname in self]
 
     def __len__(self):
         return len(self.authorizedKeys)

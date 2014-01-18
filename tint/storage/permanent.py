@@ -3,6 +3,32 @@ import anydbm
 from tint.storage.permissions import PermissionedStorage
 
 
+class MalformedURI(Exception):
+    """
+    Raised when URI is malformed.
+    """
+
+
+class TintURI(object):
+    delimiter = "/"
+
+    def __init__(self, uri):
+        self.uri = uri
+        if self.uri is not None:
+            self.parsePath()
+
+    def parsePath(self):
+        # path must be at least tint://<sha256>
+        if len(self.uri) < 47 or self.uri[:7] != "tint://":
+            raise MalformedURI("URI %s is invalid" % self.uri)
+        parts = self.uri[7:].split(self.delimiter, 1)
+        self.host = parts[0]
+        self.path = self.delimiter + parts[1]
+
+    def __str__(self):
+        return "tint://%s%s" % (self.host, self.path)
+
+
 class PermanentStorage(object):
     def __init__(self, filename):
         self.filename = filename

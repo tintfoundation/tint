@@ -1,6 +1,6 @@
 CONFIG = {
     'key': 'keys/id.pem',
-    'authorizedkeys': 'keys',
+    'authorizedkeys': 'keys/authorized',
     's2s.port': 8469,
     'dht.port': 8468,
     'web.port': 8080,
