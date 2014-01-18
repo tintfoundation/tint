@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <script type="text/javascript" src="/static/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        $.getJSON("/api/v1/keys", function(data) {
+          $("#keyid").text(data.mykey.id);
+          $("#keyvalue").text(data.mykey.key);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Welcome to Tint</h1>
+    <div>Your key ID is:</div>
+    <pre id="keyid"></pre>
+    <div>And your key value is:</div>
+    <pre id="keyvalue"></pre>
+  </body>
+</html>

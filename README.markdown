@@ -60,7 +60,7 @@ The HTTPS interface does two things:
 
 The AJAX interface has three major sections - storage, keys, and apps.  All parameters should be form encoded.  The root path is:
 
-    http://<host>/api/v1
+    http://host/api/v1
 
 #### Storage
 You can get/set/incr storage just like the RPC methods (accessing data both on the user's hub as well as the hubs of any connected friends).
@@ -71,16 +71,16 @@ Keys look like:
 
 To GET a key, use the root path followed by the key without the protocol.  For instance, send an HTTP GET to:
 
-   http://<host>/api/v1/storage/<dest sha>/chat/<my sha>/inbox
+   http://*host*/api/v1/storage/*dest sha*/chat/*my sha*/inbox
 
-to get the value for */chat/<my sha>/inbox* on the host identified by *<dest sha>*.
+to get the value for */chat/my sha/inbox* on the host identified by *dest sha*.
 
 To set the value, send a POST to the same URL structure with a *data* parameter set to the thing you want to save.  To send an increment, use a PUT with optional parameters of amount (could be negative to make a decrement) and default (what to start with if there isn't a value).  An increment will return the current value.
 
 #### Keys
 Use a GET to the path:
 
-    http://<host>/api/v1/keys
+    http://*host*/api/v1/keys
 
 To get a JSON output of the current host key and a list of all trusted keys.
 
