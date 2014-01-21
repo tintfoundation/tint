@@ -6,6 +6,7 @@ import hashlib
 
 from OpenSSL import crypto
 from twisted.internet import ssl
+from twisted.application import service
 
 from tint.log import Logger
 
@@ -96,7 +97,7 @@ class KeyPair(object):
     def __str__(self):
         return self.pemContents
 
-from twisted.application import service
+
 class KeyStore(service.Service):
     def __init__(self, keyPath, authorizedKeysDir):
         """

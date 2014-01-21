@@ -1,6 +1,7 @@
 import sys
 import os
 
+from twisted.internet import reactor
 from twisted.application import service, internet
 from twisted.web import server
 
@@ -27,6 +28,7 @@ storage.grantAllAccess(keyStore.getKeyId())
 resolver = DHTResolver(CONFIG, [("54.193.70.32", 8468)])
 kserver = internet.UDPServer(8468, resolver.getProtocol())
 kserver.setServiceParent(application)
+reactor.callLater(5, resolver.announceLocation, keyStore.getKeyId())
 
 # 4. start up local NodeToNode service
 peer = Peer(keyStore, storage, resolver)

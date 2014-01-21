@@ -4,7 +4,7 @@ from twisted.protocols.policies import TimeoutMixin
 from twisted.internet.protocol import Protocol
 from twisted.internet.defer import Deferred, TimeoutError, maybeDeferred
 
-import msgpack
+import umsgpack
 
 
 class NoSuchCommand(Exception):
@@ -21,11 +21,11 @@ class Command(object):
 
     def encode(self):
         c = [self.command] + list(self.args)
-        return msgpack.packb(c)
+        return umsgpack.packb(c)
 
     @classmethod
     def decode(self, data):
-        parts = msgpack.unpackb(data)
+        parts = umsgpack.unpackb(data)
         return Command(parts[0], parts[1:])
 
     def success(self, value):
@@ -89,7 +89,7 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
         maybeDeferred(cmd, *cmdObj.args).addCallback(self.sendResult)
 
     def sendResult(self, result):
-        result = msgpack.packb(result)
+        result = umsgpack.packb(result)
         self.transport.write("%i <%s" % (len(result) + 1, result))
 
     def sendCommand(self, cmd, args):
@@ -103,5 +103,5 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
         return cmdObj._deferred
 
     def responseReceived(self, data):
-        unpacked = msgpack.unpackb(data)
+        unpacked = umsgpack.unpackb(data)
         self._current.popleft().success(unpacked)
