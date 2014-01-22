@@ -100,6 +100,8 @@ First and foremost issue: None of the alternatives below make it easy to build a
 * [Tor](http://en.wikipedia.org/wiki/Tor_\(anonymity_network\)): Doesn't enable F2F communication or storage (and it's crazy slow).
 * [Pirate Bay](http://torrentfreak.com/how-the-pirate-bay-plans-to-beat-censorship-for-good-140105/): Suited for general/public distribution of content rather than F2F
 * [I2P](http://en.wikipedia.org/wiki/I2P): It doesn't provide storage functionality (and has been in beta since 2003).
+* [Pond](https://pond.imperialviolet.org/): Forward secure asynchronous messaging (via TOR). Per message on site, should not be used yet.
+* [Bitmessage](https://bitmessage.org/wiki/Main_Page): all messages necessarily broadcast to entire network, with resulting proof of work.  High latency.
 
 # Help
 Authors will hang out on irc.freenode.net#tint
