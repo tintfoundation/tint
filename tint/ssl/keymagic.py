@@ -22,10 +22,24 @@ class DuplicateIssuer(Exception):
     """
 
 
+class DuplicateKeyFilename(Exception):
+    """
+    Each key filename is unique to you.  There shouldn't
+    be two authorized keys with the same filename.
+    """
+
+
 class InvalidIssuer(Exception):
     """
     If an cert issuer can't be found in the local authorized keys,
     this should be raised.
+    """
+
+
+class InvalidAuthorizedKeyFilename(Exception):
+    """
+    If the key filename is not comprised of one or more alpha numeric
+    characters, this should be raised.
     """
 
 
@@ -42,6 +56,10 @@ class PublicKey(object):
         with open(path, 'r') as f:
             contents = f.read()
         return Class(contents)
+
+    def store(self, path):
+        with open(path, 'w') as f:
+            f.write(self.pemContents)
 
     def getKeyId(self):
         return sha256(self.pemContents)
@@ -155,13 +173,34 @@ class KeyStore(service.Service):
         # this shouldn't happen - if a connection is successfully made,
         # then that means the key *must* be in the local authorized keys.
         # However, this is a double check, cause safety first and all that.
-        if not issuerCommonName in self.authorizedKeys:
+        if issuerCommonName not in self.authorizedKeys:
             msg = "Issuer %s could not be found in local authorized keys"
             raise InvalidIssuer(msg % issuerCommonName)
         return PublicKey.load(self.authorizedKeys[issuerCommonName])
 
     def getAuthorizedKeysList(self):
         return [PublicKey.load(fname) for fname in self]
+
+    def setAuthorizedKey(self, publicKey, fname):
+
+        path = os.path.join(self.authorizedKeysDir, fname + ".pem")
+
+        if not fname.isalnum():
+            msg = "Filename %s is not alpha numeric"
+            raise InvalidAuthorizedKeyFilename(msg % fname)
+
+        if path in self:
+            msg = "There is already a key with the same filename - %s."
+            msg += "  If you want to update - please delete first."
+            raise DuplicateKeyFilename(msg % fname)
+
+        if publicKey.getIssuer() in self.authorizedKeys:
+            msg = "There are two keys with the same issuer - %s and %s."
+            msg += "  Only one can be used - please delete the duplicate."
+            raise DuplicateIssuer(msg % (fname, self.authorizedKeys[publicKey.getIssuer()]))
+
+        publicKey.store(path)
+        self.refreshAuthorizedKeys()
 
     def __len__(self):
         return len(self.authorizedKeys)
