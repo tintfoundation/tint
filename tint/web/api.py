@@ -5,6 +5,7 @@ from twisted.web._responses import BAD_REQUEST, BAD_GATEWAY
 
 from tint.log import Logger
 from tint.storage.permanent import TintURI
+from tint.ssl.keymagic import PublicKey
 
 log = Logger(system="TintWebAPI")
 
@@ -13,9 +14,11 @@ class BadRequest(resource.ErrorPage):
     def __init__(self):
         resource.ErrorPage.__init__(self, BAD_REQUEST, "Bad Request", "Request malformed.")
 
+
 class BadGateway(resource.ErrorPage):
     def __init__(self, msg):
         resource.ErrorPage.__init__(self, BAD_GATEWAY, "Bad Gateway", msg)
+
 
 class WebAPI(resource.Resource):
     def __init__(self, peerServer):
@@ -27,7 +30,7 @@ class APIVersionOne(resource.Resource):
     def __init__(self, peerServer):
         resource.Resource.__init__(self)
         self.putChild('storage', StorageResource(peerServer))
-        self.putChild('keys', KeysResource(peerServer))        
+        self.putChild('keys', KeysResource(peerServer))
 
 
 class Request(object):
@@ -56,9 +59,14 @@ class KeysResource(resource.Resource):
 
     def render_POST(self, req):
         wreq = Request(req)
-        req.getParam('key')
-        req.getParam('name')
-        # then pass off to keystore to save
+        key = wreq.getParam('key')
+        name = wreq.getParam('name')
+        try:
+            publicKey = PublicKey(key)
+            self.peerServer.keyStore.setAuthorizedKey(publicKey, name)
+            return "success"
+        except Exception, err:
+            return str(err)
 
 
 class StorageResource(resource.Resource):
@@ -73,10 +81,10 @@ class StorageResource(resource.Resource):
     def getKeyURI(self, req):
         uri = "tint://%s" % "/".join(req.path.split('/')[4:])
         return TintURI(uri)
-        
+
     def render_GET(self, req):
         uri = self.getKeyURI(req)
-        result = self.peerServer.get(uri.host, uri.path)        
+        result = self.peerServer.get(uri.host, uri.path)
         if result is None:
             return resource.NoResource("key not found").render(req)
         return result
@@ -85,7 +93,7 @@ class StorageResource(resource.Resource):
         wreq = Request(req)
         amount = wreq.getParam('amount', 1)
         default = wreq.getParam('default', 0)
-        uri = self.getKeyURI(req)        
+        uri = self.getKeyURI(req)
         result = self.peerServer.incr(uri.host, uri.path, amount, default)
         if result is None:
             return BadGateway("Could not reach %s" % uri.host).render(req)
