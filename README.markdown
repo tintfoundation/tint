@@ -15,7 +15,7 @@ Here are the basic properties:
  * The RPC commands are also exposed via an HTTP interface, allowing front-end (Javascript) applications to interact with the hub.  This allows for easy application development since it can all occur in a browser.
 
 # Running a Hub
-A hub is just the bundled collection of the HTTPS, RPC, and DHT services.  There is a single keypair/identity tied to each hub representing a single user.  A hub can be either local (aka, running on a user's local machine) or remote (aka, running on a server or a [Raspberry Pi](http://www.raspberrypi.org/)).
+A hub is just the bundled collection of the HTTPS, RPC, and DHT services.  There is a single keypair/identity tied to each hub representing a single user (though this may change in the future so that some number of trusted users can utilize the same hub).  A hub can be either local (aka, running on a user's local machine) or remote (aka, running on a server or a [Raspberry Pi](http://www.raspberrypi.org/)).
 
 The following sections list the basic process for running a hub in either configuration.  Many details will be filled in later.
 
@@ -104,7 +104,4 @@ First and foremost issue: None of the alternatives below make it easy to build a
 * [Bitmessage](https://bitmessage.org/wiki/Main_Page): all messages necessarily broadcast to entire network, with resulting proof of work.  High latency.
 
 # Help
-Authors will hang out on irc.freenode.net#tint
-
-# BETA Usage
-* pip install -r ./requirements.txt
+File a ticket on [Github](https://github.com/bmuller/tint) or reach out to [bmuller](https://github.com/bmuller).
