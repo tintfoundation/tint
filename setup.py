@@ -11,5 +11,5 @@ setup(
     license="MIT",
     url="http://github.com/bmuller/tint",
     packages=find_packages(),
-    install_requires=['twisted>=12.0', "u-msgpack-python>=1.5", "pyopenssl>=0.13.1"]
+    install_requires=['twisted>=14.0', "u-msgpack-python>=1.5", "pyopenssl>=0.13.1", "service_identity>=14.0.0"]
 )

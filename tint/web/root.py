@@ -14,9 +14,9 @@ class WebRoot(resource.Resource):
     def __init__(self, peerServer):
         resource.Resource.__init__(self)
         self.putChild('api', WebAPI(peerServer))
-        self.putChild('static', static.File(os.path.join(tint.web.__path__[0], "static")))
+        self.putChild('apps', static.File(os.path.join(tint.web.__path__[0], "apps")))
 
     def getChild(self, path, request):
         if path == '':
-            return Redirect("/static")
+            return Redirect("/apps/admin")
         return resource.Resource.getChild(self, path, request)

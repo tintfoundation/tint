@@ -25,7 +25,7 @@ storage = PermissionedAnyDBMStorage(CONFIG['permanent.storage'])
 storage.grantAllAccess(keyStore.getKeyId())
 
 # 3. start up DHT based on initial list
-resolver = DHTResolver(CONFIG, [("54.193.70.32", 8468)])
+resolver = DHTResolver(CONFIG, [("107.170.3.146", 8468)])
 kserver = internet.UDPServer(8468, resolver.getProtocol())
 kserver.setServiceParent(application)
 reactor.callLater(5, resolver.announceLocation, keyStore.getKeyId())

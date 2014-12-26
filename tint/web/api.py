@@ -29,6 +29,7 @@ class WebAPI(resource.Resource):
 class APIVersionOne(resource.Resource):
     def __init__(self, peerServer):
         resource.Resource.__init__(self)
+        # storage, keys, permissions, apps should be the only endpoints really
         self.putChild('storage', StorageResource(peerServer))
         self.putChild('keys', KeysResource(peerServer))
 

@@ -2,5 +2,5 @@ apidoc
 *.pid
 *.pickle
 *.pyc
-tint.db
+tint_storage.db
 *.pem

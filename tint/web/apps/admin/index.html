@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tint: Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="css/application.css">
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>    
+  </head>
+  <body>
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand">TINT</a>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/">Admin</a>
+            </li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">Apps <span class="caret"></span></a>
+              <ul class="dropdown-menu" aria-labelledby="download">
+                <li><a href="#">chat</a></li>
+                <li class="divider"></li>
+                <li><a href="#">remote storage</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="http://github.com/bmuller/tint" target="_blank">Help</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-offset-1 col-lg-10" id="content">
+          <div class="page-header">
+            <h1 id="navbar">Welcome to Tint</h1>
+          </div>
+	  
+	  <div>Your key ID is:</div>
+	  <pre id="keyid"></pre>
+	  <div>And your key value is:</div>
+	  <pre id="keyvalue"></pre>
+
+	  <script type="text/javascript">
+	    $(function() {
+            $.getJSON("/api/v1/keys", function(data) {
+            $("#keyid").text(data.mykey.id);
+            $("#keyvalue").text(data.mykey.key);
+            });
+	    });
+	  </script>
+	  
+	</div>
+      </div>
+    
+      <footer>
+	<div class="row">
+          <div id="footer" class="col-lg-offset-1 col-lg-10">
+            <ul class="list-unstyled pull-right">
+              <li><a href="https://github.com/bmuller/tint">GitHub</a></li>
+              <li><a href="https://github.com/bmuller/tint/issues">Issues</a></li>
+            </ul>
+          </div>
+        </div>
+
+    </footer>
+        </div>
+  </body>
+</html>
