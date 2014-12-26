@@ -5,6 +5,7 @@ body>.navbar-transparent .navbar-nav>.open>a{background-color:transparent !impor
 
 div#content { min-height: 500px; }
 
+#keyvalue {color: #999;}
 #home{padding-top:0}
 #home .navbar-brand{padding:13.5px 15px 12.5px}
 #home .navbar-brand>img{display:inline;margin:0 8px;height:100%}

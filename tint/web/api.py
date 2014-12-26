@@ -60,12 +60,10 @@ class KeysResource(resource.Resource):
 
     def render_POST(self, req):
         wreq = Request(req)
-        key = wreq.getParam('key')
         name = wreq.getParam('name')
         keyid = wreq.getParam('keyid')
         try:
-            publicKey = PublicKey(key)
-            self.peerServer.keyStore.setAuthorizedKey(publicKey, name)
+            self.peerServer.addFriendById(name, keyid)
             return "success"
         except Exception, err:
             return str(err)
