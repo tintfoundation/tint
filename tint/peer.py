@@ -92,7 +92,7 @@ class Peer(object):
         Lookup a public key with the given keyId and save if found.
         """
         d = self.resolver.getPublicKey(keyId)
-        return d.addCallback(self.addFriend)
+        return d.addCallback(self.addFriend, name)
 
     def addFriend(self, publicKey, name):
         """

@@ -31,7 +31,11 @@ class DHTResolver(object):
         return self.kserver.get(keyId).addCallback(verify)
 
     def resolve(self, keyId):
-        return self.kserver.get("%s-location" % keyId)
+        def parse(locations):
+            pairs = (locations or "").split(',')
+            return map(lambda pair: tuple(pair.split(':')), pairs)
+        d = self.kserver.get("%s-location" % keyId)
+        return d.addCallback(parse)
 
     def announceLocation(self, myKeyId, myPublicKey):
         def announce(ips):

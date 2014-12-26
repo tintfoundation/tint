@@ -83,14 +83,17 @@ class ConnectionPool(object):
             return False
         return connection.sendCommand(cmd, args)
 
-    def createConnection(self, addr, keyId):
-        if addr is None:
+    def createConnection(self, addrs, keyId):
+        if len(addr) == 0:
             return False
 
-        host, port = addr
+        host, port = addrs.pop()
         cc = ClientCreator(reactor, TintProtocol, self)
         d = cc.connectSSL(host, port, self.contextFactory)
-        return d.addCallback(self.saveConnection, keyId)
+        d.addCallback(self.saveConnection, keyId)
+        if len(addr) > 0:
+            d.addErrback(lambda _: self.createConnection(addrs, keyId))
+        return d
 
     def forgetConnection(self, keyId):
         self.log.info("removing connection %s from pool" % keyId)
