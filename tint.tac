@@ -16,26 +16,26 @@ from config import CONFIG
 
 application = service.Application("tint")
 
-# 1. initialize key file if doesn't exist
+# 1. Initialize key file if it doesn't exist.
 keyStore = KeyStore(CONFIG['key'], CONFIG['authorizedkeys'])
 keyStore.setServiceParent(application)
 
-# 2. initialize local storage, granting key hash ability to access all of db
+# 2. Initialize local storage, granting key hash ability to access all of db.
 storage = PermissionedAnyDBMStorage(CONFIG['permanent.storage'])
 storage.grantAllAccess(keyStore.getKeyId())
 
-# 3. start up DHT based on initial list
+# 3. Start DHT based on initial list of nodes.
 resolver = DHTResolver(CONFIG, [("107.170.3.146", 8468)])
 kserver = internet.UDPServer(8468, resolver.getProtocol())
 kserver.setServiceParent(application)
 reactor.callLater(5, resolver.announceLocation, keyStore.getKeyId())
 
-# 4. start up local NodeToNode service
+# 4. Start local NodeToNode service.
 peer = Peer(keyStore, storage, resolver)
-pserver = internet.SSLServer(CONFIG['s2s.port'], peer.protocolFactory, peer.contextFactory, interface="127.0.0.1")
+pserver = internet.SSLServer(CONFIG['s2s.port'], peer.protocolFactory, peer.contextFactory)
 pserver.setServiceParent(application)
 
-# 5. start up local web interface
+# 5. Start local web interface.
 web = WebRoot(peer)
-server = internet.TCPServer(CONFIG['web.port'], server.Site(web))
+server = internet.TCPServer(CONFIG['web.port'], server.Site(web), interface="127.0.0.1")
 server.setServiceParent(application)
