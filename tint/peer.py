@@ -98,4 +98,5 @@ class Peer(object):
         """
         Add a friend with the given public key.
         """
+        self.log.debug("Adding key for %s: %s" % (name, publicKey))
         self.keyStore.setAuthorizedKey(PublicKey(publicKey), name)

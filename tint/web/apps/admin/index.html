@@ -63,10 +63,10 @@
       <h3>Add Friends</h3>
       <form role="form" action="/api/v1/keys" method="post">
         <label for="name">Name</label>
-        <input type="text" required id="name" placeholder="Friendly McLovely"/>
+        <input type="text" required name="name" id="name" placeholder="Friendly McLovely"/>
 
         <label for="keyid">TintID</label>
-        <input type="text" required id="keyid" pattern="[a-fA-F0-9]{64}" placeholder="08878f70d2697c3cba57c4bd4ed68570d63ec85e9b4841096916429ab1dde704"/>
+        <input type="text" required name="keyid" id="keyid" pattern="[a-fA-F0-9]{64}" placeholder="08878f70d2697c3cba57c4bd4ed68570d63ec85e9b4841096916429ab1dde704"/>
         <input name="add" type="submit" value="Add">
       </form>
     </div>

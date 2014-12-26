@@ -5,10 +5,14 @@ from twisted.internet import defer
 
 from kademlia.network import Server
 
+from tint.log import Logger
+from tint.ssl.keymagic import PublicKey
+
 
 class DHTResolver(object):
     def __init__(self, config, bootstrapNeighbors):
         self.config = config
+        self.log = Logger(system=self)
         if os.path.isfile(config['dht.state.cache']):
             self.kserver = Server.loadState(config['dht.state.cache'])
         else:
@@ -28,6 +32,8 @@ class DHTResolver(object):
             if key is not None and PublicKey(key).getKeyId() == keyId:
                 return key
             return None
+
+        self.log.debug("Getting key text for key id %s" % keyId)
         return self.kserver.get(keyId).addCallback(verify)
 
     def resolve(self, keyId):
