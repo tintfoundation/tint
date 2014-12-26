@@ -62,6 +62,7 @@ class KeysResource(resource.Resource):
         wreq = Request(req)
         key = wreq.getParam('key')
         name = wreq.getParam('name')
+        keyid = wreq.getParam('keyid')
         try:
             publicKey = PublicKey(key)
             self.peerServer.keyStore.setAuthorizedKey(publicKey, name)

@@ -19,15 +19,27 @@ class DHTResolver(object):
     def getProtocol(self):
         return self.kserver.protocol
 
-    def resolve(self, keyId):
-        return self.kserver.get(keyId)
+    def getPublicKey(self, keyId):
+        """
+        Get the public key from the network, and return only if the key is
+        the one that matches the keyId based on hash.
+        """
+        def verify(key):
+            if key is not None and PublicKey(key).getKeyId() == keyId:
+                return key
+            return None
+        return self.kserver.get(keyId).addCallback(verify)
 
-    def announceLocation(self, myKeyId):
+    def resolve(self, keyId):
+        return self.kserver.get("%s-location" % keyId)
+
+    def announceLocation(self, myKeyId, myPublicKey):
         def announce(ips):
             ips = [self.localAddress()] + ips
             ipports = map(lambda ip: "%s:%i" % (ip, self.config['s2s.port']), ips)
-            return self.kserver.set(myKeyId, ",".join(ipports))
-        d = self.kserver.inetVisibleIP()
+            return self.kserver.set("%s-location" % myKeyId, ",".join(ipports))
+        d = self.kserver.set(myKeyId, str(myPublicKey))
+        d.addCallback(lambda _: self.kserver.inetVisibleIP())
         return d.addCallback(announce)
 
     def localAddress(self):

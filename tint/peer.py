@@ -1,4 +1,5 @@
 from tint.ssl.context import PFSContextFactory
+from tint.ssl.keymagic import PublicKey
 from tint.log import Logger
 
 from tint.protocols.tintp import ConnectionPool
@@ -85,3 +86,16 @@ class Peer(object):
         if hostKeyId == self.getKeyId():
             return self.storage.incr(hostKeyId, storagePath, amount, default)
         return self.pool.send(hostKeyId, 'incr', storagePath, amount, default)
+
+    def addFriendById(self, name, keyId):
+        """
+        Lookup a public key with the given keyId and save if found.
+        """
+        d = self.resolver.getPublicKey(keyId)
+        return d.addCallback(self.addFriend)
+
+    def addFriend(self, publicKey, name):
+        """
+        Add a friend with the given public key.
+        """
+        self.keyStore.setAuthorizedKey(PublicKey(publicKey), name)

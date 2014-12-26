@@ -1,1 +1,0 @@
-tint: twistd -noy tint.tac --pidfile /tmp/tint.pid
