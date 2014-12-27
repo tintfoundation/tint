@@ -100,5 +100,5 @@ class Peer(object):
         """
         pk = PublicKey(publicKey)
         self.log.debug("Adding key for %s: %s" % (name, pk.getKeyId()))
-        self.storage.grantAccess(pk.getKeyId(), "friends/%s" % pk.getKeyId())
+        self.storage.grantAccess(pk.getKeyId(), pk.getKeyId())
         self.keyStore.setAuthorizedKey(pk, name)

@@ -107,4 +107,5 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
 
     def responseReceived(self, data):
         unpacked = umsgpack.unpackb(data)
+        self.log.debug("result received: %s" % data)
         self._current.popleft().success(unpacked)
