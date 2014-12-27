@@ -3,8 +3,13 @@ body>.navbar{-webkit-transition:background-color 300ms ease-in;transition:backgr
 body>.navbar-transparent{background-color:transparent}
 body>.navbar-transparent .navbar-nav>.open>a{background-color:transparent !important}
 
-div#content { min-height: 500px; }
+#friends {
+  border: 2px solid #DDD;
+}
 
+#form-addfriend label {display: none;}
+#form-addfriend input {width: 100%;}
+#addfriend {width: 100%;}
 #keyvalue {color: #999;}
 #home{padding-top:0}
 #home .navbar-brand{padding:13.5px 15px 12.5px}

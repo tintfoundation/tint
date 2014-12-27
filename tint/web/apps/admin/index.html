@@ -40,42 +40,63 @@
 
     <div class="container">
       <div class="row">
-        <div class="col-lg-offset-1 col-lg-10" id="content">
-          <div class="page-header">
-            <h1 id="navbar">Welcome to Tint</h1>
-          </div>
+        <div class="col-lg-offset-1 col-lg-11" id="content">
+            <div class="page-header">
+              <h1 id="navbar">Welcome to Tint</h1>
+            </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-offset-1 col-lg-3" id="content">
 
-	  <h3>My TintID</h3>
-	  <pre id="tintid"></pre>
-	  <h4>My TintID maps to this Public Key</h4>
-	  <pre id="keyvalue"></pre>
-
-	  <script type="text/javascript">
-	    $(function() {
-            $.getJSON("/api/v1/keys", function(data) {
-              $("#tintid").text(data.mykey.id);
-              $("#keyvalue").text(data.mykey.key);
+          <h3>Friends</h3>
+          <ul id="friends" class="list-group">
+          </ul>
+          <script type="text/javascript">
+            $(function() {
+              $.getJSON("/api/v1/keys", function(data) {
+                $.each(data.authorized_keys, function(i, d) {
+                  $("#friends").append("<li class ='list-group-item'>" + d.name + "</li>");
+                });
+              });
             });
-	    });
-	  </script>
+          </script>
+          <form id="form-addfriend" role="form" action="/api/v1/keys" method="post">
+            <div>
+              <label for="name">Name</label>
+              <input type="text" required name="name" id="name" placeholder="Name (Ex: Friendly McLovely)"/>
+            </div>
+            <div>
+              <label for="keyid">TintID</label>
+              <input type="text"  required name="keyid" id="keyid" pattern="[a-fA-F0-9]{64}" placeholder="TintID (Ex: 08878f70d2697c3cba57c...)"/>
+            </div>
+            <input id="addfriend" class="btn-info" name="add" type="submit" value="Add friend">
+          </form>
 
-    <div>
-      <h3>Add Friends</h3>
-      <form role="form" action="/api/v1/keys" method="post">
-        <label for="name">Name</label>
-        <input type="text" required name="name" id="name" placeholder="Friendly McLovely"/>
+        </div>
 
-        <label for="keyid">TintID</label>
-        <input type="text" required name="keyid" id="keyid" pattern="[a-fA-F0-9]{64}" placeholder="08878f70d2697c3cba57c4bd4ed68570d63ec85e9b4841096916429ab1dde704"/>
-        <input name="add" type="submit" value="Add">
-      </form>
-    </div>
+        <div class="col-lg-7" id="content">
+            <h3>My TintID</h3>
+            <pre id="tintid"></pre>
+            <h4>My TintID maps to this PublicKey</h4>
+            <pre id="keyvalue"></pre>
 
-	</div>
+            <script type="text/javascript">
+              $(function() {
+                    $.getJSON("/api/v1/keys", function(data) {
+                      $("#tintid").text(data.mykey.id);
+                      $("#keyvalue").text(data.mykey.key);
+                    });
+              });
+            </script>
+        </div>
+
+
+
       </div>
 
       <footer>
-	<div class="row">
+        <div class="row">
           <div id="footer" class="col-lg-offset-1 col-lg-10">
             <ul class="list-unstyled pull-right">
               <li><a href="https://github.com/bmuller/tint">GitHub</a></li>
@@ -83,8 +104,7 @@
             </ul>
           </div>
         </div>
-
-    </footer>
-        </div>
+      </footer>
+    </div>
   </body>
 </html>
