@@ -6,6 +6,7 @@ from twisted.internet.defer import Deferred, TimeoutError, maybeDeferred
 
 import umsgpack
 
+from tint.log import Logger
 
 class NoSuchCommand(Exception):
     """
@@ -47,6 +48,7 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
     def __init__(self, timeOut=10):
         self._current = deque()
         self.persistentTimeOut = self.timeOut = timeOut
+        self.log = Logger(system=self)
 
     def _cancelCommands(self, reason):
         while self._current:
@@ -86,6 +88,7 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
         cmd = getattr(self, "cmd_%s" % cmdObj.command, None)
         if cmd is None:
             raise NoSuchCommand("%s is not a valid command" % cmdObj.command)
+        self.log.debug("RPC command received: %s" % cmdObj)
         maybeDeferred(cmd, *cmdObj.args).addCallback(self.sendResult)
 
     def sendResult(self, result):
