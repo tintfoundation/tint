@@ -44,9 +44,10 @@ class InvalidAuthorizedKeyFilename(Exception):
 
 
 class PublicKey(object):
-    def __init__(self, pemContents):
+    def __init__(self, pemContents, name=None):
         self.pemContents = pemContents
         self.cert = ssl.Certificate.loadPEM(pemContents)
+        self.name = name
 
     def getIssuer(self):
         return self.cert.getIssuer().commonName
@@ -55,7 +56,8 @@ class PublicKey(object):
     def load(Class, path):
         with open(path, 'r') as f:
             contents = f.read()
-        return Class(contents)
+        name = os.path.basename(os.path.splitext(path)[0])
+        return Class(contents, name)
 
     def store(self, path):
         with open(path, 'w') as f:

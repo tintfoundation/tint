@@ -50,7 +50,7 @@ class KeysResource(resource.Resource):
     def render_GET(self, req):
         keys = []
         for key in self.peerServer.keyStore.getAuthorizedKeysList():
-            keys.append({ 'id': key.getKeyId(), 'key': str(key) })
+            keys.append({ 'id': key.getKeyId(), 'name': key.name, 'key': str(key) })
         result = { 'mykey':
                    { 'id': self.peerServer.getKeyId(),
                      'key': str(self.peerServer.getPublicKey()) },

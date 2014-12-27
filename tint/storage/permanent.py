@@ -1,5 +1,8 @@
 import anydbm
 
+from zope.interface import implements
+from zope.interface import Interface
+
 from tint.storage.permissions import PermissionedStorage
 
 
@@ -29,23 +32,32 @@ class TintURI(object):
         return "tint://%s%s" % (self.host, self.path)
 
 
-class PermanentStorage(object):
+class IStorage(Interface):
+    """
+    Storage that should be durable and acidic.
+    """
+    def get(key, default=None):
+        """
+        Get a key.  Optional default if not found can be returned.
+        """
+
+    def set(key, value):
+        """
+        Set a key with the given value.
+        """
+
+    def incr(key, amount=1, default=0):
+        """
+        Increment given key with amount.  If key doesn't exist already, initialize
+        with default.
+        """
+
+
+class AnyDBMStorage(object):
+    implements(IStorage)
+
     def __init__(self, filename):
         self.filename = filename
-
-    def get(self, key, default=None):
-        raise NotImplementedError
-
-    def set(self, key, value):
-        raise NotImplementedError
-
-    def incr(self, key, amount=1, default=0):
-        raise NotImplementedError
-
-
-class AnyDBMStorage(PermanentStorage):
-    def __init__(self, filename):
-        PermanentStorage.__init__(self, filename)
         self.db = anydbm.open(self.filename, 'c')
 
     def get(self, key, default=None):

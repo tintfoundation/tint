@@ -38,8 +38,11 @@ class DHTResolver(object):
 
     def resolve(self, keyId):
         def parse(locations):
-            pairs = (locations or "").split(',')
-            return map(lambda pair: tuple(pair.split(':')), pairs)
+            results = []
+            for location in (locations or "").split(','):
+                host, port = location.split(':')
+                results.append((host, int(port)))
+            return results
         d = self.kserver.get("%s-location" % keyId)
         return d.addCallback(parse)
 

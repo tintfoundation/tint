@@ -84,14 +84,15 @@ class ConnectionPool(object):
         return connection.sendCommand(cmd, args)
 
     def createConnection(self, addrs, keyId):
-        if len(addr) == 0:
+        if len(addrs) == 0:
             return False
 
         host, port = addrs.pop()
+        self.log.debug("Attempting to create connection to %s:%i" % (host, port))
         cc = ClientCreator(reactor, TintProtocol, self)
         d = cc.connectSSL(host, port, self.contextFactory)
         d.addCallback(self.saveConnection, keyId)
-        if len(addr) > 0:
+        if len(addrs) > 0:
             d.addErrback(lambda _: self.createConnection(addrs, keyId))
         return d
 
