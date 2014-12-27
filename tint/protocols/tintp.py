@@ -73,7 +73,7 @@ class ConnectionPool(object):
 
     def send(self, keyId, cmd, *args):
         if keyId in self.connections:
-            return self.sendOnConnection(self.connections[keyId], cmd)
+            return self.sendOnConnection(self.connections[keyId], cmd, args)
         d = self.resolver.resolve(keyId)
         d.addCallback(self.createConnection, keyId)
         return d.addCallback(self.sendOnConnection, cmd, args)
