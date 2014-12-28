@@ -26,10 +26,10 @@ class TintURI(object):
             raise MalformedURI("URI %s is invalid" % self.uri)
         parts = self.uri[7:].split(self.delimiter, 1)
         self.host = parts[0]
-        self.path = parts[1]
+        self.path = "/" + parts[1]
 
     def __str__(self):
-        return "tint://%s/%s" % (self.host, self.path)
+        return "tint://%s%s" % (self.host, self.path)
 
 
 class IStorage(Interface):
