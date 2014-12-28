@@ -1,4 +1,5 @@
 # Tint
+[![Build Status](https://secure.travis-ci.org/bmuller/tint.png?branch=master)](https://travis-ci.org/bmuller/tint)
 Tint is an experimental communications network that enables [friend-to-friend (F2F)](http://en.wikipedia.org/wiki/Friend-to-friend) communication via a simple protocol.
 
 Here are the goals:
