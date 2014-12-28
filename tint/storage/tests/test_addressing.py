@@ -1,7 +1,8 @@
 from twisted.trial import unittest
 
-from tint.storage.permanent import TintURI
+from tint.storage.addressing import TintURI
 from tint.ssl.keymagic import sha256
+
 
 class TintURITest(unittest.TestCase):
     def test_str(self):
@@ -9,4 +10,3 @@ class TintURITest(unittest.TestCase):
         uri = TintURI("tint://%s/a/path" % hsha)
         self.assertEqual(uri.host, hsha)
         self.assertEqual(uri.path, '/a/path')
-

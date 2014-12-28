@@ -1,35 +1,12 @@
 import anydbm
 
+from itertools import imap
+
 from zope.interface import implements
 from zope.interface import Interface
 
 from tint.storage.permissions import PermissionedStorage
-
-
-class MalformedURI(Exception):
-    """
-    Raised when URI is malformed.
-    """
-
-
-class TintURI(object):
-    delimiter = "/"
-
-    def __init__(self, uri):
-        self.uri = uri
-        if self.uri is not None:
-            self.parsePath()
-
-    def parsePath(self):
-        # path must be at least tint://<sha256>
-        if len(self.uri) < 47 or self.uri[:7] != "tint://":
-            raise MalformedURI("URI %s is invalid" % self.uri)
-        parts = self.uri[7:].split(self.delimiter, 1)
-        self.host = parts[0]
-        self.path = "/" + parts[1]
-
-    def __str__(self):
-        return "tint://%s%s" % (self.host, self.path)
+from tint.storage.addressing import Path
 
 
 class IStorage(Interface):
@@ -46,10 +23,16 @@ class IStorage(Interface):
         Set a key with the given value.
         """
 
-    def incr(key, amount=1, default=0):
+    def push(key, value):
         """
-        Increment given key with amount.  If key doesn't exist already, initialize
-        with default.
+        Given key, create a new key at <key>/<id> with the given value, where <id>
+        is an auto-incrementing integer value.
+        """
+
+    def ls(key, offset=0, length=100):
+        """
+        Return a list of child keys at the given location, starting with the given offset
+        and for the given length.  Length cannot be more than 1000.
         """
 
 
@@ -68,9 +51,25 @@ class AnyDBMStorage(object):
     def set(self, key, value):
         self.db[key] = str(value)
 
-    def incr(self, key, amount=1, default=0):
-        value = int(self.get(key, default)) + amount
-        self.set(key, value)
+    def push(self, key, value):
+        path = Path(key)
+        mkey = path.join('_maxid')
+        id = int(self.get(mkey, -1)) + 1
+        self.set(mkey, id)
+        vkey = path.join(id)
+        self.set(vkey, value)
+        return vkey
+
+    def ls(self, key, offset=0, length=100):
+        length = min(length, 1000)
+        kids = set([])
+        path = Path(key)
+        for k in imap(Path, self.db.keys()):
+            if path.contains(k):
+                kids.add(path.childFrom(k))
+        kids = list(kids)
+        kids.sort()
+        return kids[offset:][:length]
 
     def __getitem__(self, key):
         return self.db[key]

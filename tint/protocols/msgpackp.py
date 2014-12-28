@@ -8,6 +8,7 @@ import umsgpack
 
 from tint.log import Logger
 
+
 class NoSuchCommand(Exception):
     """
     Exception raised when a non existent command is called.

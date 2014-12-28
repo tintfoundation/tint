@@ -1,8 +1,6 @@
 import socket
 import os
 
-from twisted.internet import defer
-
 from kademlia.network import Server
 
 from tint.log import Logger

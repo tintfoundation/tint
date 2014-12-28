@@ -4,8 +4,7 @@ from twisted.web import resource
 from twisted.web._responses import BAD_REQUEST, BAD_GATEWAY
 
 from tint.log import Logger
-from tint.storage.permanent import TintURI
-from tint.ssl.keymagic import PublicKey
+from tint.storage.addressing import TintURI
 
 log = Logger(system="TintWebAPI")
 
