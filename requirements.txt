@@ -3,4 +3,4 @@ twisted>=14.0
 u-msgpack-python>=1.5
 kademlia>=0.3
 service_identity>=14.0.0
-kyotocabinet>=1.0
+netifaces>=0.10.4

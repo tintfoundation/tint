@@ -2,6 +2,7 @@ import json
 
 from twisted.web import resource
 from twisted.web._responses import BAD_REQUEST, BAD_GATEWAY
+from twisted.web.server import NOT_DONE_YET
 
 from tint.log import Logger
 from tint.storage.addressing import TintURI
@@ -39,6 +40,36 @@ class Request(object):
 
     def getParam(self, name, default=None):
         return self.req.args.get(name, [default])[0]
+
+    def isDir(self):
+        return self.req.path[-1] == '/'
+
+    def setHead(self, response_code=200, content_type="text/javascript"):
+        self.req.setHeader('server', 'tint web')
+        self.req.setHeader('content-type', "%s; charset=UTF-8" % content_type)
+        if response_code != 200:
+            self.req.setResponseCode(response_code)
+
+    def renderError(self, error):
+        self.renderJSON({ 'error': str(error) })
+
+    def renderJSON(self, result):
+        self.render(json.dumps(result))
+
+    def render(self, value=None, response_code=200, content_type="text/javascript"):
+        value = value or ""
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+        callback = self.getParam('callback')
+        if content_type == "text/javascript" and callback is not None:
+            value = "%s(%s)" % (callback, value)
+        self.setHead(response_code, content_type)
+        log.info("writing: %s" % value)
+        try:
+            self.req.write(value)
+            self.req.finish()
+        except RuntimeError, e:
+            log.warning("Connection lost.  Did not write JS response: %s" % str(e))
 
 
 class KeysResource(resource.Resource):
@@ -83,10 +114,16 @@ class StorageResource(resource.Resource):
 
     def render_GET(self, req):
         uri = self.getKeyURI(req)
-        result = self.peerServer.get(uri.host, uri.path)
-        if result is None:
-            return resource.NoResource("key not found").render(req)
-        return result
+        wreq = Request(req)
+        if wreq.isDir():
+            offset = int(wreq.getParam('offset', 0))
+            length = int(wreq.getParam('length', 100))
+            result = self.peerServer.ls(uri.host, str(uri.path), offset, length)
+        else:
+            result = self.peerServer.get(uri.host, str(uri.path))
+        result.addCallback(wreq.renderJSON)
+        result.addErrback(wreq.renderError)
+        return NOT_DONE_YET
 
     def render_PUT(self, req):
         wreq = Request(req)

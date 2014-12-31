@@ -4,6 +4,7 @@ from tint.log import Logger
 
 from tint.protocols.tintp import ConnectionPool
 from tint.protocols.tintp import TintProtocolFactory
+from tint.storage.addressing import Path
 
 
 class Peer(object):
@@ -66,26 +67,23 @@ class Peer(object):
         self.log.debug("getting storagePath %s on %s" % (storagePath, hostKeyId))
         return self.pool.send(hostKeyId, 'get', storagePath)
 
-    def incr(self, hostKeyId, storagePath, amount=1, default=0):
+    def push(self, hostKeyId, storagePath):
         """
-        Increment a value on a host.
-
-        @param hostKeyId: The key id for the destination host to increment the
-        given key.  This could be the local host, in which case the hostKey
-        will be the same as this C{Peer}'s keyStore keyId.
-
-        @param storagePath: The path to the key to increment.  For instance, this
-        could be something like /chat/<somekey>/inbox.
-
-        @param amount: The amount to increment.  This could be negative, which
-        would make this actually a decrement.  By default this is 1.
-
-        @param default: The amount to use as the default if no value exists
-        at the given storagePath.  By default this is 0.
+        Given key, create a new key at <key>/<id> with the given value, where <id>
+        is an auto-incrementing integer value starting at 0.
         """
         if hostKeyId == self.getKeyId():
-            return self.storage.incr(hostKeyId, storagePath, amount, default)
-        return self.pool.send(hostKeyId, 'incr', storagePath, amount, default)
+            return self.storage.push(hostKeyId, storagePath)
+        return self.pool.send(hostKeyId, 'push', storagePath)
+
+    def ls(self, hostKeyId, storagePath, offset, length):
+        """
+        Given key, get all children keys (with the given offset and length).  Length cannot
+        be more than 1000.
+        """
+        if hostKeyId == self.getKeyId():
+            return self.storage.ls(hostKeyId, storagePath, offset, length)
+        return self.pool.send(hostKeyId, 'ls', storagePath, offset, length)
 
     def addFriendById(self, name, keyId):
         """
@@ -100,5 +98,6 @@ class Peer(object):
         """
         pk = PublicKey(publicKey)
         self.log.debug("Adding key for %s: %s" % (name, pk.getKeyId()))
-        self.storage.grantAccess(pk.getKeyId(), pk.getKeyId())
+        path = str(Path(pk.getKeyId()))
+        self.storage.grantAccess(pk.getKeyId(), path)
         self.keyStore.setAuthorizedKey(pk, name)

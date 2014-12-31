@@ -1,5 +1,6 @@
-import socket
 import os
+
+import netifaces
 
 from kademlia.network import Server
 
@@ -36,8 +37,11 @@ class DHTResolver(object):
 
     def resolve(self, keyId):
         def parse(locations):
+            self.log.debug("Locations for %s: %s" % (keyId, locations))
             results = []
-            for location in (locations or "").split(','):
+            if locations is None or locations == "":
+                return results
+            for location in locations.split(','):
                 host, port = location.split(':')
                 results.append((host, int(port)))
             return results
@@ -46,12 +50,16 @@ class DHTResolver(object):
 
     def announceLocation(self, myKeyId, myPublicKey):
         def announce(ips):
-            ips = [self.localAddress()] + ips
+            ips = self.localAddresses() + ips
             ipports = map(lambda ip: "%s:%i" % (ip, self.config['s2s.port']), ips)
             return self.kserver.set("%s-location" % myKeyId, ",".join(ipports))
         d = self.kserver.set(myKeyId, str(myPublicKey))
         d.addCallback(lambda _: self.kserver.inetVisibleIP())
         return d.addCallback(announce)
 
-    def localAddress(self):
-        return socket.gethostbyname(socket.gethostname())
+    def localAddresses(self):
+        result = []
+        for iface in netifaces.interfaces():
+            addys = netifaces.ifaddresses(iface).get(netifaces.AF_INET)
+            result += [ addy['addr'] for addy in (addys or []) if addy['addr'] != '127.0.0.1' ]
+        return result

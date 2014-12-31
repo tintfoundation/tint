@@ -2,6 +2,7 @@ from twisted.internet import reactor
 from twisted.internet.protocol import Factory, ClientCreator
 
 from tint.protocols.msgpackp import MsgPackProtocol
+from tint.protocols.exceptions import HostUnreachableError
 from tint.log import Logger
 
 
@@ -19,10 +20,11 @@ class TintProtocol(MsgPackProtocol):
 
     def getPeersKeyId(self):
         if self.peersKeyId is None:
-            issuer = self.transport.getPeerCertificate().get_issuer()
-            issuerCommonName = issuer.commonName
-            key = self.connectionPool.keyStore.getIssuerPublicKey(issuerCommonName)
-            self.peersKeyId = key.getKeyId()
+            cert = self.transport.getPeerCertificate()
+            if cert is not None:
+                issuerCommonName = cert.get_issuer().commonName
+                key = self.connectionPool.keyStore.getIssuerPublicKey(issuerCommonName)
+                self.peersKeyId = key.getKeyId()
         return self.peersKeyId
 
     def dataReceived(self, data):
@@ -45,8 +47,11 @@ class TintProtocol(MsgPackProtocol):
     def cmd_set(self, key, value):
         return self.storage.set(self.getPeersKeyId(), key, value)
 
-    def cmd_incr(self, key, amount, default):
-        return self.storage.incr(self.getPeersKeyId(), key, amount, default)
+    def cmd_push(self, key, value):
+        return self.storage.push(self.getPeersKeyId(), key, value)
+
+    def cmd_ls(self, key, offset, length):
+        return self.storage.ls(self.getPeersKeyId(), key, offset, length)
 
 
 class TintProtocolFactory(Factory):
@@ -85,12 +90,12 @@ class ConnectionPool(object):
 
     def createConnection(self, addrs, keyId):
         if len(addrs) == 0:
-            return False
+            raise HostUnreachableError("Cannot connect to %s" % keyId)
 
         host, port = addrs.pop()
         self.log.debug("Attempting to create connection to %s:%i" % (host, port))
         cc = ClientCreator(reactor, TintProtocol, self)
-        d = cc.connectSSL(host, port, self.contextFactory)
+        d = cc.connectSSL(host, port, self.contextFactory, timeout=5)
         d.addCallback(self.saveConnection, keyId)
         if len(addrs) > 0:
             d.addErrback(lambda _: self.createConnection(addrs, keyId))
@@ -98,7 +103,8 @@ class ConnectionPool(object):
 
     def forgetConnection(self, keyId):
         self.log.info("removing connection %s from pool" % keyId)
-        del self.connections[keyId]
+        if keyId in self.connections:
+            del self.connections[keyId]
 
     def saveConnection(self, connection, keyId):
         self.connections[keyId] = connection

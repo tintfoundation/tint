@@ -29,7 +29,7 @@ storage.grantAllAccess(keyStore.getKeyId())
 
 # 3. start up DHT based on initial list, store current location and public key in DHT
 resolver = DHTResolver(CONFIG, [("107.170.3.146", 8468)])
-kserver = internet.UDPServer(8468, resolver.getProtocol())
+kserver = internet.UDPServer(CONFIG['dht.port'], resolver.getProtocol())
 kserver.setServiceParent(application)
 reactor.callLater(5, resolver.announceLocation, keyStore.getKeyId(), keyStore.getPublicKey())
 

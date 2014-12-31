@@ -76,8 +76,12 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
 
         if len(self._buffer) >= self._expectedLength:
             data = self._buffer[1:self._expectedLength]
-            self._request = self._buffer[0] == '>'
-            self.commandReceived(data) if self._request else self.responseReceived(data)
+            if self._buffer[0] == '>':
+                self.commandReceived(data)
+            elif self._buffer[0] == '<':
+                self.responseReceived(data)
+            elif self._buffer[0] == 'e':
+                self.errorReceived(data)
             self._buffer = self._buffer[self._expectedLength:]
             self._expectedLength = None
 
@@ -90,7 +94,13 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
         if cmd is None:
             raise NoSuchCommand("%s is not a valid command" % cmdObj.command)
         self.log.debug("RPC command received: %s" % cmdObj)
-        maybeDeferred(cmd, *cmdObj.args).addCallback(self.sendResult)
+        d = maybeDeferred(cmd, *cmdObj.args)
+        d.addCallback(self.sendResult)
+        d.addErrback(self.sendError)
+
+    def sendError(self, error):
+        result = umsgpack.packb(str(error))
+        self.transport.write("%i e%s" % (len(result) + 1, result))
 
     def sendResult(self, result):
         result = umsgpack.packb(result)
@@ -110,3 +120,8 @@ class MsgPackProtocol(Protocol, TimeoutMixin):
         unpacked = umsgpack.unpackb(data)
         self.log.debug("result received: %s" % data)
         self._current.popleft().success(unpacked)
+
+    def errorReceived(self, data):
+        unpacked = umsgpack.unpackb(data)
+        self.log.debug("error received: %s" % data)
+        self._current.popleft().fail(Exception(unpacked))

@@ -49,6 +49,10 @@ class PermissionedStorage(object):
         self.testAccess(requestor, key)
         self.storage.set(key, value)
 
-    def incr(self, requestor, key, amount=1, default=0):
+    def push(self, requestor, key, value):
         self.testAccess(requestor, key)
-        self.storage.incr(key, amount, default)
+        self.storage.push(key, value)
+
+    def ls(self, requestor, key, offset, length):
+        self.testAccess(requestor, key)
+        self.storage.ls(key, offset, length)

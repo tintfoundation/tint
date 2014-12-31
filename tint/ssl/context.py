@@ -7,9 +7,8 @@ from tint.log import Logger
 
 class PFSContextFactory(DefaultOpenSSLContextFactory):
     """
-    Perfect forward secrecy!  I think...
+    Eventually, a DH rather than RSA method should be used here.
     """
-
     def __init__(self, keyStore, expiresIn=86400):
         self.keyStore = keyStore
         self.expiresIn = expiresIn
@@ -39,6 +38,7 @@ class PFSContextFactory(DefaultOpenSSLContextFactory):
         privkey, signedcert = self.keyStore.generateSignedTmpKeyPair(self.expiresIn)
         context = SSL.Context(SSL.SSLv23_METHOD)
         context.set_options(SSL.OP_NO_SSLv2)
+        context.set_options(SSL.OP_NO_SSLv3)
         context.use_privatekey(privkey.original)
         context.use_certificate(signedcert.original)
         flags = SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT

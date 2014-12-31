@@ -25,7 +25,7 @@ class TintURI(object):
 
 
 class Path(object):
-    def __init__(self, path):
+    def __init__(self, path='/'):
         self.path = Path.normalize(path)
 
     def join(self, additional):
@@ -67,6 +67,8 @@ class Path(object):
     def normalize(klass, path):
         if path == '':
             path = '/'
+        if path[0] != '/':
+            path = "/%s" % path
         if len(path) > 1 and path[-1] == '/':
             path = path[:-1]
         return path
