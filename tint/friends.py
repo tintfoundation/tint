@@ -11,7 +11,8 @@ Friend = namedtuple('Friend', ['id', 'name', 'key'])
 
 
 class FriendsList(object):
-    def __init__(self, keyStore, resolver):
+    def __init__(self, storage, keyStore, resolver):
+        self.storage = storage
         self.keyStore = keyStore
         self.resolver = resolver
         self.log = Logger(system=self)

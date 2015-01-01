@@ -13,7 +13,7 @@ class Peer(object):
         self.contextFactory = PFSContextFactory(self.keyStore)
         self.pool = ConnectionPool(resolver, self.contextFactory, self.keyStore, self.storage)
         self.protocolFactory = TintProtocolFactory(self.pool)
-        self.friends = FriendsList(self.keyStore, resolver)
+        self.friends = FriendsList(self.storage, self.keyStore, resolver)
         self.log = Logger(system=self)
 
     def getKeyId(self):
