@@ -8,6 +8,12 @@ from tint.log import Logger
 from tint.ssl.keymagic import PublicKey
 
 
+class KeyNotResolvedError(Exception):
+    """
+    Couldn't resolve key in the DHT.
+    """
+
+
 class DHTResolver(object):
     def __init__(self, config, bootstrapNeighbors):
         self.config = config

@@ -183,8 +183,17 @@ class KeyStore(service.Service):
     def getAuthorizedKeysList(self):
         return [PublicKey.load(fname) for fname in self]
 
-    def setAuthorizedKey(self, publicKey, fname):
+    def removeAuthorizedKey(self, fname):
+        path = os.path.join(self.authorizedKeysDir, fname + ".pem")
+        if not os.path.isfile(path):
+            return False
+        try:
+            os.remove(path)
+            return True
+        except:
+            return False
 
+    def setAuthorizedKey(self, publicKey, fname):
         path = os.path.join(self.authorizedKeysDir, fname + ".pem")
 
         if not fname.isalnum():

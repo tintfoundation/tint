@@ -78,13 +78,9 @@ class KeysResource(resource.Resource):
         self.peerServer = peerServer
 
     def render_GET(self, req):
-        keys = []
-        for key in self.peerServer.keyStore.getAuthorizedKeysList():
-            keys.append({ 'id': key.getKeyId(), 'name': key.name, 'key': str(key) })
-        result = { 'mykey':
-                   { 'id': self.peerServer.getKeyId(),
-                     'key': str(self.peerServer.getPublicKey()) },
-                   'authorized_keys': keys }
+        result = { 'mykey': { 'id': self.peerServer.getKeyId(),
+                              'key': str(self.peerServer.getPublicKey()) },
+                   'authorized_keys': [ f.__dict__ for f in self.peerServer.friends ] }
         req.setHeader('content-type', "application/json")
         return json.dumps(result)
 
@@ -92,11 +88,16 @@ class KeysResource(resource.Resource):
         wreq = Request(req)
         name = wreq.getParam('name')
         keyid = wreq.getParam('keyid')
-        try:
-            self.peerServer.addFriendById(name, keyid)
-            return "success"
-        except Exception, err:
-            return str(err)
+        result = self.peerServer.friends.addFriendById(name, keyid)
+        result.addCallback(wreq.renderJSON)
+        result.addErrback(wreq.renderError)
+        return NOT_DONE_YET
+
+    def render_DELETE(self, req):
+        wreq = Request(req)
+        result = self.peerServer.friends.removeFriend(wreq.getParam('name'))
+        req.setHeader('content-type', "application/json")
+        return json.dumps({ 'result': result })
 
 
 class StorageResource(resource.Resource):
@@ -125,20 +126,14 @@ class StorageResource(resource.Resource):
         result.addErrback(wreq.renderError)
         return NOT_DONE_YET
 
-    def render_PUT(self, req):
-        wreq = Request(req)
-        amount = wreq.getParam('amount', 1)
-        default = wreq.getParam('default', 0)
-        uri = self.getKeyURI(req)
-        result = self.peerServer.incr(uri.host, uri.path, amount, default)
-        if result is None:
-            return BadGateway("Could not reach %s" % uri.host).render(req)
-        return result
-
     def render_POST(self, req):
-        wreq = Request(req)
-        data = wreq.getParam('data', "")
         uri = self.getKeyURI(req)
-        if not self.peerServer.set(uri.host, uri.path, data):
-            return BadGateway("Could not reach %s" % uri.host).render(req)
-        return ""
+        wreq = Request(req)
+        value = wreq.getParam('value', '')
+        if wreq.isDir():
+            result = self.peerServer.push(uri.host, str(uri.path), value)
+        else:
+            result = self.peerServer.set(uri.host, str(uri.path), value)
+        result.addCallback(wreq.renderJSON)
+        result.addErrback(wreq.renderError)
+        return NOT_DONE_YET

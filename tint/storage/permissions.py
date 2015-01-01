@@ -8,22 +8,22 @@ class DefaultPermissions(object):
     def __init__(self, storage):
         self.storage = storage
 
-    def canAccess(self, requestor, key):
+    def canAccess(self, requestor, key, optype='*'):
         """
         @param key The path to the storage.  Should always start with a '/'.
         """
         parts = key[1:].split('/')
         while len(parts) > 0:
             path = "a/%s/%s" % (requestor, "/".join(parts))
-            if self.storage.get(path, None) == '1':
+            if optype in self.storage.get(path, '').split(','):
                 return True
             parts.pop()
         return False
 
-    def grantAccess(self, requestor, key):
+    def grantAccess(self, requestor, key, optype="*"):
         if not self.canAccess(requestor, key):
             path = "a/%s%s" % (requestor, key)
-            self.storage.set(path, '1')
+            self.storage.set(path, optype)
 
 
 class PermissionedStorage(object):
