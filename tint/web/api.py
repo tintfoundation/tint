@@ -41,7 +41,7 @@ class APIResource(resource.Resource):
     def __init__(self, peerServer):
         resource.Resource.__init__(self)
         self.peerServer = peerServer
-        self.myId = self.peerServer.getKeyId()        
+        self.myId = self.peerServer.getKeyId()
 
 
 class APIResourceWithPath(APIResource):
@@ -72,7 +72,7 @@ class PermissionsResource(APIResourceWithPath):
         requestor = wreq.getParam('as', self.myId)
         optype = wreq.getParam('optype', '*')
         self.peerServer.storage.grantAccess(requestor, uri, optype)
-        access = self.peerServer.storage.accessAvailable(requestor, uri)        
+        access = self.peerServer.storage.accessAvailable(requestor, uri)
         req.setHeader('content-type', "application/json")
         return json.dumps(access)
 

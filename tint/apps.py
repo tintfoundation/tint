@@ -11,7 +11,6 @@ class AppsList(object):
     def getAppNames(self):
         dirlist = glob.glob(os.path.join(self.location, "*"))
         return [ os.path.basename(fname) for fname in dirlist ]
-            
 
     def __iter__(self):
         for appname in self.getAppNames():
