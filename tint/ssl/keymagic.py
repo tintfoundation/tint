@@ -189,6 +189,7 @@ class KeyStore(service.Service):
             return False
         try:
             os.remove(path)
+            self.refreshAuthorizedKeys()
             return True
         except:
             return False

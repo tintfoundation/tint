@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="tintAdminApp">
   <head>
     <meta charset="utf-8">
     <title>Tint: Admin</title>
@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="css/application.css">
     <script src="js/jquery-1.10.2.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/admin.js"></script>
   </head>
   <body>
     <div class="navbar navbar-default navbar-fixed-top">
@@ -47,20 +49,14 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-offset-1 col-lg-3" id="content">
+        <div class="col-lg-offset-1 col-lg-3" id="content" ng-controller="FriendsListCtrl">
 
           <h3>Friends</h3>
           <ul id="friends" class="list-group">
+	    <li class="list-group-item" ng-repeat="friend in friends">
+	      {{friend.name}} <button style="float: right;" ng-click="removeFriend($index)">delete</button>
+	    </li>
           </ul>
-          <script type="text/javascript">
-            $(function() {
-              $.getJSON("/api/v1/keys", function(data) {
-                $.each(data.authorized_keys, function(i, d) {
-                  $("#friends").append("<li class ='list-group-item'>" + d.name + "</li>");
-                });
-              });
-            });
-          </script>
           <form id="form-addfriend" role="form" action="/api/v1/keys" method="post">
             <div>
               <label for="name">Name</label>
