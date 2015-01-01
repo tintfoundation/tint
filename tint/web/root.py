@@ -11,10 +11,10 @@ log = Logger(system="TintWeb")
 
 
 class WebRoot(resource.Resource):
-    def __init__(self, peerServer):
+    def __init__(self, peerServer, appsdir):
         resource.Resource.__init__(self)
-        self.putChild('api', WebAPI(peerServer))
-        self.putChild('apps', static.File(os.path.join(tint.web.__path__[0], "apps")))
+        self.putChild('api', WebAPI(peerServer, appsdir))
+        self.putChild('apps', static.File(appsdir)) #os.path.join(tint.web.__path__[0], "apps")))
 
     def getChild(self, path, request):
         if path == '':

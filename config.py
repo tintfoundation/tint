@@ -6,5 +6,6 @@ CONFIG = {
     'web.port': 8080,
     'permanent.storage': 'tint_storage',
     'dht.bootstrap': '54.193.70.32',
-    'dht.state.cache': 'kademlia.pickle'
+    'dht.state.cache': 'kademlia.pickle',
+    'apps.dir': 'apps'
     }

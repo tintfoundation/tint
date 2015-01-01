@@ -1,0 +1,20 @@
+# Chat App
+
+Send a message:
+1) write to local
+push tint://<my tid>/apps/chat/<other tid>/out { message: "hi there", ts: <timestamp> }
+(this will write to tint://<my tid>/apps/chat/<other tid>/out/<id>)
+
+2) write to remote
+push tint://<other tit>/<my tid>/apps/chat/in { message: "hi there", ts: <timestamp> }
+
+
+Check for received messages for specific user:
+ls tint://<my tid>/<other tid>/apps/chat/in range=(-10,10)
+
+
+See who has chatted with me:
+1) Get a list of all users
+ls tint://<my tid>/*
+2) For each user, get most recent messages (if any - may have not used the app)
+ls tint://<my tid>/<other tid>/apps/chat/in/* range=(-10, 10)

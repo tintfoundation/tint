@@ -8,20 +8,28 @@ class DefaultPermissions(object):
     def __init__(self, storage):
         self.storage = storage
 
+    def accessAvailable(self, requestor, key):
+        print "Testing access for %s to %s" % (requestor, key)
+        access = set()
+        parts = [""] + key[1:].split('/')
+        while len(parts) > 0:
+            path = "a/%s/%s" % (requestor, "/".join(parts))
+            s = self.storage.get(path, None)
+            print "looking for %s : %s" % (path, s)
+            if s is not None:
+                access.update(s.split(','))
+            parts.pop()
+        return list(access)
+
     def canAccess(self, requestor, key, optype='*'):
         """
         @param key The path to the storage.  Should always start with a '/'.
         """
-        parts = key[1:].split('/')
-        while len(parts) > 0:
-            path = "a/%s/%s" % (requestor, "/".join(parts))
-            if optype in self.storage.get(path, '').split(','):
-                return True
-            parts.pop()
-        return False
+        access = self.accessAvailable(requestor, key)
+        return '*' in access or optype in access
 
     def grantAccess(self, requestor, key, optype="*"):
-        if not self.canAccess(requestor, key):
+        if not self.canAccess(requestor, key, optype):
             path = "a/%s%s" % (requestor, key)
             self.storage.set(path, optype)
 
@@ -31,14 +39,24 @@ class PermissionedStorage(object):
         self.storage = storage
         self.permissions = permissions or DefaultPermissions(self.storage)
 
-    def grantAccess(self, requestor, key):
-        self.permissions.grantAccess(requestor, key)
+    def grantAccess(self, requestor, key, optype="*"):
+        self.permissions.grantAccess(requestor, key, optype)
 
     def grantAllAccess(self, requestor):
-        self.permissions.grantAccess(requestor, "")
+        self.permissions.grantAccess(requestor, "/")
+
+    def canAccess(self, requestor, key):
+        return self.permissions.canAccess(requestor, key)
+
+    def accessAvailable(self, requestor, key):
+        return self.permissions.accessAvailable(requestor, key)
 
     def testAccess(self, requestor, key):
-        if not self.permissions.canAccess(requestor, key):
+        """
+        Like canAccess, except throw a NotAuthorizedError if requestor
+        cannot access.
+        """
+        if not self.canAccess(requestor, key):
             raise NotAuthorizedError("%s cannot access %s" % (requestor, key))
 
     def get(self, requestor, key, default=None):

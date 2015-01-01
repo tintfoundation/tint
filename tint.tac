@@ -39,6 +39,6 @@ pserver = internet.SSLServer(CONFIG['s2s.port'], peer.protocolFactory, peer.cont
 pserver.setServiceParent(application)
 
 # 5. Start local web interface.
-web = WebRoot(peer)
+web = WebRoot(peer, CONFIG['apps.dir'])
 server = internet.TCPServer(CONFIG['web.port'], server.Site(web), interface="127.0.0.1")
 server.setServiceParent(application)
