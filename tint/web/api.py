@@ -111,7 +111,7 @@ class KeysResource(APIResource):
         return json.dumps({ 'result': result })
 
 
-class StorageResource(APIResource):
+class StorageResource(APIResourceWithPath):
     def render_GET(self, req):
         uri = self.getKeyURI(req)
         wreq = Request(req)
