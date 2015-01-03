@@ -7,6 +7,8 @@ body>.navbar-transparent .navbar-nav>.open>a{background-color:transparent !impor
   border: 2px solid #DDD;
 }
 
+a:hover { cursor: pointer; }
+
 #form-addfriend label {display: none;}
 #form-addfriend input {width: 100%;}
 #addfriend {width: 100%;}

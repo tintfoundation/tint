@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
     <link rel="stylesheet" href="css/application.css">
-    <script src="js/jquery-1.10.2.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
     <script src="js/angular.min.js"></script>
+    <script src="js/ui-bootstrap-tpls-0.12.0.min.js"></script>    
     <script src="js/admin.js"></script>
   </head>
   <body>
@@ -22,12 +21,12 @@
             <li>
               <a href="/">Admin</a>
             </li>
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download">Apps <span class="caret"></span></a>
-              <ul class="dropdown-menu" aria-labelledby="download">
-                <li><a href="#">chat</a></li>
-                <li class="divider"></li>
-                <li><a href="#">remote storage</a></li>
+            <li class="dropdown" dropdown ng-controller="AppsListCtrl">
+              <a class="dropdown-toggle" dropdown-toggle id="download">Apps <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+		<li ng-repeat="app in apps">
+		  <a href="/apps/{{app.name}}">{{app.name}}</a>
+		</li>
               </ul>
             </li>
           </ul>
@@ -50,23 +49,23 @@
       </div>
       <div class="row">
         <div class="col-lg-offset-1 col-lg-3" id="content" ng-controller="FriendsListCtrl">
-
           <h3>Friends</h3>
           <ul id="friends" class="list-group">
 	    <li class="list-group-item" ng-repeat="friend in friends">
 	      {{friend.name}} <button style="float: right;" ng-click="removeFriend($index)">delete</button>
 	    </li>
           </ul>
-          <form id="form-addfriend" role="form" action="/api/v1/keys" method="post">
+
+          <form id="form-addfriend">
             <div>
               <label for="name">Name</label>
-              <input type="text" required name="name" id="name" placeholder="Name (Ex: Friendly McLovely)"/>
+              <input type="text" ng-model="friend.name" placeholder="Name (Ex: Billy)"/>
             </div>
             <div>
               <label for="keyid">TintID</label>
-              <input type="text"  required name="keyid" id="keyid" pattern="[a-fA-F0-9]{64}" placeholder="TintID (Ex: 08878f70d2697c3cba57c...)"/>
+              <input type="text" required ng-model="friend.keyid" pattern="[a-fA-F0-9]{64}" placeholder="TintID (Ex: 08878f70d2697c3cba57c...)"/>
             </div>
-            <input id="addfriend" class="btn-info" name="add" type="submit" value="Add friend">
+	    <input type="submit" ng-click="addFriend(friend)" value="Add Friend"/>
           </form>
 
         </div>
@@ -78,12 +77,14 @@
             <pre id="keyvalue"></pre>
 
             <script type="text/javascript">
+	      /*	      
               $(function() {
                     $.getJSON("/api/v1/keys", function(data) {
                       $("#tintid").text(data.mykey.id);
                       $("#keyvalue").text(data.mykey.key);
-                    });
               });
+              });
+	      */	      
             </script>
         </div>
 

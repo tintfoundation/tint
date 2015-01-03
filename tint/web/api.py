@@ -42,6 +42,7 @@ class APIResource(resource.Resource):
         resource.Resource.__init__(self)
         self.peerServer = peerServer
         self.myId = self.peerServer.getKeyId()
+        self.log = Logger(system=self)
 
 
 class APIResourceWithPath(APIResource):
@@ -84,7 +85,7 @@ class AppsResource(APIResource):
 
     def render_GET(self, req):
         req.setHeader('content-type', "application/json")
-        return json.dumps(self.apps.getAppNames())
+        return json.dumps([ {'name': name} for name in self.apps.getAppNames() ])
 
 
 class KeysResource(APIResource):

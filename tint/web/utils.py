@@ -22,7 +22,7 @@ class Request(object):
             self.req.setResponseCode(response_code)
 
     def renderError(self, error):
-        self.renderJSON({ 'error': str(error) })
+        self.renderJSON({ 'error': str(error) }, response_code=500)
 
     def renderJSON(self, result):
         self.render(json.dumps(result))

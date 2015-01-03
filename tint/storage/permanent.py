@@ -7,6 +7,7 @@ from zope.interface import Interface
 
 from tint.storage.permissions import PermissionedStorage
 from tint.storage.addressing import Path
+from tint.log import Logger
 
 
 class IStorage(Interface):
@@ -41,14 +42,17 @@ class AnyDBMStorage(object):
 
     def __init__(self, filename):
         self.filename = filename
+        self.log = Logger(system=self)
         self.db = anydbm.open(self.filename, 'c')
 
     def get(self, key, default=None):
+        self.log.debug("Getting %s" % key)
         if key in self.db:
             return self.db[key]
         return default
 
     def set(self, key, value):
+        self.log.debug("Setting %s = %s" % (key, value))
         self.db[key] = str(value)
 
     def push(self, key, value):

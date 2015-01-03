@@ -1,3 +1,6 @@
+from tint.log import Logger
+
+
 class NotAuthorizedError(Exception):
     """
     Someone is trying to access something they can't.
@@ -7,15 +10,15 @@ class NotAuthorizedError(Exception):
 class DefaultPermissions(object):
     def __init__(self, storage):
         self.storage = storage
+        self.log = Logger(system=self)
 
     def accessAvailable(self, requestor, key):
-        print "Testing access for %s to %s" % (requestor, key)
+        self.log.info("Testing access for %s to %s" % (requestor, key))
         access = set()
         parts = [""] + key[1:].split('/')
         while len(parts) > 0:
-            path = "a/%s/%s" % (requestor, "/".join(parts))
+            path = "a/%s%s" % (requestor, "/".join(parts))
             s = self.storage.get(path, None)
-            print "looking for %s : %s" % (path, s)
             if s is not None:
                 access.update(s.split(','))
             parts.pop()
