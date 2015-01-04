@@ -1,4 +1,7 @@
+from twisted.internet import defer
+
 from tint.log import Logger
+from tint.storage.addressing import Path
 
 
 class NotAuthorizedError(Exception):
@@ -13,28 +16,38 @@ class DefaultPermissions(object):
         self.log = Logger(system=self)
 
     def accessAvailable(self, requestor, key):
+        def gather(results):
+            access = set()
+            for result in results:
+                if result is not None:
+                    access.update(result.split(','))
+            return list(access)
+
         self.log.info("Testing access for %s to %s" % (requestor, key))
-        access = set()
-        parts = [""] + key[1:].split('/')
-        while len(parts) > 0:
-            path = "a/%s%s" % (requestor, "/".join(parts))
-            s = self.storage.get(path, None)
-            if s is not None:
-                access.update(s.split(','))
-            parts.pop()
-        return list(access)
+        ds = []
+        for path in Path(key).ancestors():
+            path = str(Path('a').join(requestor).join(path))
+            ds.append(self.storage.get(path, None))
+        return defer.gatherResults(ds).addCallback(gather)
 
     def canAccess(self, requestor, key, optype='*'):
         """
         @param key The path to the storage.  Should always start with a '/'.
         """
-        access = self.accessAvailable(requestor, key)
-        return '*' in access or optype in access
+        def test(access):
+            return '*' in access or optype in access
+        d = self.accessAvailable(requestor, key)
+        return d.addCallback(test)
 
     def grantAccess(self, requestor, key, optype="*"):
-        if not self.canAccess(requestor, key, optype):
-            path = "a/%s%s" % (requestor, key)
-            self.storage.set(path, optype)
+        def test(access):
+            if not access:
+                path = Path('a').join(requestor).join(Path(key))
+                return self.storage.set(str(path), optype)
+            return defer.succeed(optype)
+
+        d = self.canAccess(requestor, key, optype)
+        return d.addCallback(test)
 
 
 class PermissionedStorage(object):
@@ -43,10 +56,10 @@ class PermissionedStorage(object):
         self.permissions = permissions or DefaultPermissions(self.storage)
 
     def grantAccess(self, requestor, key, optype="*"):
-        self.permissions.grantAccess(requestor, key, optype)
+        return self.permissions.grantAccess(requestor, key, optype)
 
     def grantAllAccess(self, requestor):
-        self.permissions.grantAccess(requestor, "/")
+        return self.permissions.grantAccess(requestor, "/")
 
     def canAccess(self, requestor, key):
         return self.permissions.canAccess(requestor, key)
@@ -59,21 +72,24 @@ class PermissionedStorage(object):
         Like canAccess, except throw a NotAuthorizedError if requestor
         cannot access.
         """
-        if not self.canAccess(requestor, key):
-            raise NotAuthorizedError("%s cannot access %s" % (requestor, key))
+        def _test(can):
+            if not can:
+                raise NotAuthorizedError("%s cannot access %s" % (requestor, key))
+        d = self.canAccess(requestor, key)
+        return d.addCallback(_test)
 
     def get(self, requestor, key, default=None):
-        self.testAccess(requestor, key)
-        return self.storage.get(key, default)
+        d = self.testAccess(requestor, key)
+        return d.addCallback(lambda _: self.storage.get(key, default))
 
     def set(self, requestor, key, value):
-        self.testAccess(requestor, key)
-        self.storage.set(key, value)
+        d = self.testAccess(requestor, key)
+        return d.addCallback(lambda _: self.storage.set(key, value))
 
     def push(self, requestor, key, value):
-        self.testAccess(requestor, key)
-        self.storage.push(key, value)
+        d = self.testAccess(requestor, key)
+        return d.addCallback(lambda _: self.storage.push(key, value))
 
     def ls(self, requestor, key, offset, length):
-        self.testAccess(requestor, key)
-        self.storage.ls(key, offset, length)
+        d = self.testAccess(requestor, key)
+        return d.addCallback(lambda _: self.storage.ls(key, offset, length))

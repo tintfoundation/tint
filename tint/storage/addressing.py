@@ -28,10 +28,23 @@ class Path(object):
     def __init__(self, path='/'):
         self.path = Path.normalize(path)
 
+    def ancestors(self):
+        result = [Path()]
+        if self == Path('/'):
+            return result
+        for kid in str(self)[1:].split('/'):
+            result.append(result[-1].join(kid))
+        return result
+
     def join(self, additional):
+        if isinstance(additional, list):
+            return reduce(lambda p, i: p.join(i), additional, Path())
+        additional = str(additional)
         if additional[0] == '/':
             additional = additional[1:]
-        return "%s/%s" (self, additional)
+        if str(self) == "/":
+            return Path("/%s" % additional)
+        return Path("%s/%s" % (self, additional))
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -52,6 +65,9 @@ class Path(object):
 
     def __str__(self):
         return self.path
+
+    def __len__(self):
+        return len(str(self))
 
     def __contains__(self, other):
         """

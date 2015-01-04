@@ -47,8 +47,8 @@
             </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-lg-offset-1 col-lg-3" id="content" ng-controller="FriendsListCtrl">
+      <div class="row" ng-controller="FriendsListCtrl">
+        <div class="col-lg-offset-1 col-lg-3" id="content">
           <h3>Friends</h3>
           <ul id="friends" class="list-group">
 	    <li class="list-group-item" ng-repeat="friend in friends">
@@ -72,24 +72,10 @@
 
         <div class="col-lg-7" id="content">
             <h3>My TintID</h3>
-            <pre id="tintid"></pre>
+            <pre id="tintid">{{myid}}</pre>
             <h4>My TintID maps to this PublicKey</h4>
-            <pre id="keyvalue"></pre>
-
-            <script type="text/javascript">
-	      /*	      
-              $(function() {
-                    $.getJSON("/api/v1/keys", function(data) {
-                      $("#tintid").text(data.mykey.id);
-                      $("#keyvalue").text(data.mykey.key);
-              });
-              });
-	      */	      
-            </script>
+            <pre id="keyvalue">{{mykey}}</pre>
         </div>
-
-
-
       </div>
 
       <footer>

@@ -3,6 +3,8 @@ var tintAdminApp = angular.module('tintAdminApp', ['ui.bootstrap']);
 tintAdminApp.controller('FriendsListCtrl', function($scope, $http) {
 			   $http.get('/api/v1/keys').success(function(data) {
 								$scope.friends = data.authorized_keys;
+								$scope.myid = data.mykey.id;
+								$scope.mykey = data.mykey.key;
 							     });
 			   $scope.removeFriend = function(index) {
 			      $http.delete('/api/v1/keys', { params: { name: $scope.friends[index].name } });

@@ -122,18 +122,18 @@ class StorageResource(APIResourceWithPath):
             result = self.peerServer.ls(uri.host, str(uri.path), offset, length)
         else:
             result = self.peerServer.get(uri.host, str(uri.path))
-        result.addCallback(wreq.renderJSON)
+        result.addCallback(wreq.renderSuccess)
         result.addErrback(wreq.renderError)
         return NOT_DONE_YET
 
     def render_POST(self, req):
         uri = self.getKeyURI(req)
         wreq = Request(req)
-        value = wreq.getParam('value', '')
+        value = wreq.jsonPayload('value', '')
         if wreq.isDir():
             result = self.peerServer.push(uri.host, str(uri.path), value)
         else:
             result = self.peerServer.set(uri.host, str(uri.path), value)
-        result.addCallback(wreq.renderJSON)
+        result.addCallback(wreq.renderSuccess)
         result.addErrback(wreq.renderError)
         return NOT_DONE_YET

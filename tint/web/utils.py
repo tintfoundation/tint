@@ -9,6 +9,9 @@ class Request(object):
     def __init__(self, req):
         self.req = req
 
+    def jsonPayload(self, name, default=None):
+        return json.loads(self.req.content.getvalue()).get(name, default)
+
     def getParam(self, name, default=None):
         return self.req.args.get(name, [default])[0]
 
@@ -22,10 +25,15 @@ class Request(object):
             self.req.setResponseCode(response_code)
 
     def renderError(self, error):
-        self.renderJSON({ 'error': str(error) }, response_code=500)
+        obj = { 'successful': False, 'error': str(error) }
+        self.renderJSON(obj, response_code=500)
 
-    def renderJSON(self, result):
-        self.render(json.dumps(result))
+    def renderSuccess(self, result):
+        obj = { 'successful': True, 'result': result }
+        self.renderJSON(obj)
+
+    def renderJSON(self, result, **kwargs):
+        self.render(json.dumps(result), **kwargs)
 
     def render(self, value=None, response_code=200, content_type="text/javascript"):
         value = value or ""
