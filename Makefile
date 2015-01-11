@@ -4,3 +4,7 @@ lint:
 
 test:
 	trial tint
+
+run:
+	pip install -r requirements.txt
+	twistd -noy tint.tac
