@@ -92,6 +92,13 @@ class WebSocketProtocol(WebSocketServerProtocol):
             self.send(MSGTYPES.WELCOME, sessionid, {})
 
 
+    def onGOODBYE(self, msg):
+        """
+        Echo the same message back.
+        """
+        self.send(msg.typeid, *msg.args)
+
+
     def onSUBSCRIBE(self, msg):
         rid, options, topic = msg.args
         et = topic.split('.')[-1]
