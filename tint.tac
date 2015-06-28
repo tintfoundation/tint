@@ -8,6 +8,7 @@ from twisted.python.log import ILogObserver
 
 sys.path.append(os.path.dirname(__file__))
 from tint.web.root import WebRoot
+from tint.web.wspubsub import WebSocketRoot
 from tint.storage.permanent import PermissionedAnyDBMStorage
 from tint.ssl.keymagic import KeyStore
 from tint.resolution import DHTResolver
@@ -42,3 +43,8 @@ pserver.setServiceParent(application)
 web = WebRoot(peer, CONFIG['apps.dir'])
 server = internet.TCPServer(CONFIG['web.port'], server.Site(web), interface="127.0.0.1")
 server.setServiceParent(application)
+
+# 6. Start local web sockets interface.
+ws = WebSocketRoot(peer, "ws://localhost:9000")
+wserver = internet.TCPServer(9000, ws, interface="127.0.0.1")
+wserver.setServiceParent(application)
