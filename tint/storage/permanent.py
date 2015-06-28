@@ -107,6 +107,7 @@ class AnyDBMStorage(ObservableStorage):
     implements(IStorage)
 
     def __init__(self, filename):
+        super(ObservableStorage, self).__init__()
         self.filename = filename
         self.log = Logger(system=self)
         self.db = anydbm.open(self.filename, 'c')
