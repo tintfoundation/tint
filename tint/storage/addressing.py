@@ -53,7 +53,7 @@ class Path(object):
         """
         Get the immediate child component from other.  For instance,
         if this path is /one/two and the other is /one/two/three/four,
-        then the immeidate child component for this path is 'three'.
+        then the immediate child component for this path is 'three'.
 
         Return None if this path doesn't contain the other.
         """

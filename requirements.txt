@@ -1,6 +1,6 @@
 pyopenssl>=0.13.1
 twisted>=14.0
 u-msgpack-python>=1.5
-kademlia>=0.4
+kademlia>=0.5
 service_identity>=14.0.0
 netifaces>=0.10.4
