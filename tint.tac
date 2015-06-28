@@ -45,6 +45,6 @@ server = internet.TCPServer(CONFIG['web.port'], server.Site(web), interface="127
 server.setServiceParent(application)
 
 # 6. Start local web sockets interface.
-ws = WebSocketRoot(peer, "ws://localhost:9000")
-wserver = internet.TCPServer(9000, ws, interface="127.0.0.1")
+ws = WebSocketRoot(peer, "ws://localhost:%i" % CONFIG['websockets.port'])
+wserver = internet.TCPServer(CONFIG['websockets.port'], ws, interface="127.0.0.1")
 wserver.setServiceParent(application)
